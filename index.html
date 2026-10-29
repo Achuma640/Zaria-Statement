@@ -104,12 +104,13 @@ function navMap(u){
   const sx=Math.max(0,Math.min(NAVIMG.naturalWidth-W,cx-W/2)),sy=Math.max(0,Math.min(NAVIMG.naturalHeight-H,cy-H/2));
   mp.width=900;mp.height=450;const k=900/W,g=mp.getContext('2d');
   g.drawImage(NAVIMG,sx,sy,W,H,0,0,900,450);
-  parts.forEach(n=>{g.beginPath();NAVP[n].forEach((p,i)=>{const X=(p[0]-sx)*k,Y=(p[1]-sy)*k;i?g.lineTo(X,Y):g.moveTo(X,Y);});g.closePath();g.fillStyle='rgba(201,162,39,.55)';g.fill();g.lineWidth=4;g.strokeStyle='#1E5631';g.stroke();});
+  parts.forEach(n=>{g.beginPath();NAVP[n].forEach((p,i)=>{const X=(p[0]-sx)*k,Y=(p[1]-sy)*k;i?g.lineTo(X,Y):g.moveTo(X,Y);});g.closePath();g.fillStyle='#C0392B';g.fill();g.lineWidth=4;g.strokeStyle='#7A1F16';g.stroke();});
+  parts.forEach(n=>{const q=NAVP[n];let mx=0,my=0;q.forEach(p=>{mx+=p[0];my+=p[1];});mx=(mx/q.length-sx)*k;my=(my/q.length-sy)*k;g.fillStyle='#FFFFFF';g.font='bold 30px Arial,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(n,mx,my);g.textAlign='left';g.textBaseline='alphabetic';});
   const lg=document.querySelector('.hl');
   g.fillStyle='#141414';g.fillRect(0,0,300,112);
   if(lg&&lg.complete)g.drawImage(lg,8,4,284,Math.min(104,284*lg.naturalHeight/lg.naturalWidth));
   g.fillStyle='rgba(20,20,20,.85)';g.fillRect(0,386,900,64);g.fillStyle='#F4E9C6';g.font='bold 34px Arial,sans-serif';
-  g.fillText('Your plot '+u+' is shown in gold',16,430);
+  g.fillText('Your plot '+u+' is shown in red',16,430);
   mp.hidden=false;hd.hidden=true;
 }
 function show(raw){
