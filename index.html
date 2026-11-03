@@ -136,7 +136,8 @@ function show(raw){
   let stt;
   if(V.nd&&ci<V.nd)stt={c:'#7F8C8D',e:'#4D5656',t:'Plot '+u+': not billed for '+cm};
   else{const pd=ci<18?!!V.cov[ci]:((V.ahead||[])[ci-18]||0)>0;
-   stt=pd?{c:'#1E8449',e:'#145A32',t:'Plot '+u+': PAID for '+cm}:{c:'#C0392B',e:'#7A1F16',t:'Plot '+u+': NOT PAID for '+cm};}
+   let li=ci;const cv=k=>k<18?!!V.cov[k]:(((V.ahead||[])[k-18]||0)>=5000);while(pd&&li<31&&cv(li+1))li++;const lm=MNF[(li+4)%12]+' '+(2025+Math.floor((li+4)/12));
+   stt=pd?{c:'#1E8449',e:'#145A32',t:'Plot '+u+': PAID for '+cm+(li>ci?' - fully paid until '+lm:'')}:{c:'#C0392B',e:'#7A1F16',t:'Plot '+u+': NOT PAID for '+cm};}
   navMap(u,stt);
   {const pl=u.split('-')[0],acc='1136#'+pl,pb=$('paybox');
   pb.innerHTML='<div class="pt2">Pay service charge for plot '+u+' (KES 5,000 a month, due by the 5th)</div><button type="button" data-c="820820">Paybill <b>820820</b> &nbsp;Copy</button><button type="button" data-c="'+acc+'">Account <b>'+acc+'</b> &nbsp;Copy</button><div class="ok" id="cpmsg" aria-live="polite">Tap a button to copy, then open M-Pesa (Lipa na M-Pesa &gt; Paybill) or Airtel Money and paste. <a href="tel:*334%23">Open M-Pesa menu (*334#)</a></div>';
