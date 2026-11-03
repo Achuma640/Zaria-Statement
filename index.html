@@ -132,11 +132,11 @@ function show(raw){
   msg.hidden=true;out.hidden=false;
   const MNF=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const nowD=new Date();let ci=(nowD.getFullYear()-2025)*12+nowD.getMonth()-4;if(nowD.getDate()<6)ci-=1;
-  const cm=MN[(ci+4)%12]+' '+(2025+Math.floor((ci+4)/12));
+  const cm=MN[(ci+4)%12]+"'"+String(2025+Math.floor((ci+4)/12)).slice(2);
   let stt;
   if(V.nd&&ci<V.nd)stt={c:'#7F8C8D',e:'#4D5656',t:'Plot '+u+': not billed for '+cm};
   else{const pd=ci<18?!!V.cov[ci]:((V.ahead||[])[ci-18]||0)>0;
-   let li=ci;const cv=k=>k<18?!!V.cov[k]:(((V.ahead||[])[k-18]||0)>=5000);while(pd&&li<31&&cv(li+1))li++;const lm=MN[(li+4)%12]+' '+(2025+Math.floor((li+4)/12));
+   let li=ci;const cv=k=>k<18?!!V.cov[k]:(((V.ahead||[])[k-18]||0)>=5000);while(pd&&li<31&&cv(li+1))li++;const lm=MN[(li+4)%12]+"'"+String(2025+Math.floor((li+4)/12)).slice(2);
    stt=pd?{c:'#1E8449',e:'#145A32',t:'Plot '+u+': PAID for '+cm+(li>ci?' - fully paid until '+lm:'')}:{c:'#C0392B',e:'#7A1F16',t:'Plot '+u+': NOT PAID for '+cm};}
   navMap(u,stt);
   {const pl=u.split('-')[0],acc='1136#'+pl,pb=$('paybox');
