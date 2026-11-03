@@ -144,8 +144,8 @@ function show(raw){
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,()=>{m.textContent='Could not copy. Type '+t;});
     else{try{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done();}catch(e){m.textContent='Could not copy. Type '+t;}}});}
   $('plot').textContent=u;$('name').textContent=info[0];$('status').textContent=info[1];
-  {const lp=mine.slice().sort((x,y)=>x[0]<y[0]?1:x[0]>y[0]?-1:0)[0];const el=$('lastpay');
-  if(lp){const dt=new Date(lp[0]+'T00:00:00');el.innerHTML='<span class="ll">Last payment</span><span class="lv">'+dt.getDate()+' '+MN[dt.getMonth()]+' '+dt.getFullYear()+'</span><span class="la">KES '+fmt(lp[2])+' · '+(lp[7]==='General'?'Service charge':lp[7]==='Road'?'Road':lp[7])+'</span>';}
+  {const lp=mine.slice().sort((x,y)=>{const kx=x[0]+(x[8]||''),ky=y[0]+(y[8]||'');return kx<ky?1:kx>ky?-1:0})[0];const t12=t=>{if(!t)return '';const [h,m]=t.split(':').map(Number);return (h%12||12)+':'+String(m).padStart(2,'0')+(h<12?'am':'pm')};const el=$('lastpay');
+  if(lp){const dt=new Date(lp[0]+'T00:00:00');el.innerHTML='<span class="ll">Last payment</span><span class="lv">'+dt.getDate()+' '+MN[dt.getMonth()]+' '+dt.getFullYear()+(lp[8]?' at '+t12(lp[8]):'')+'</span><span class="la">KES '+fmt(lp[2])+' · '+(lp[7]==='General'?'Service charge':lp[7]==='Road'?'Road':lp[7])+'</span>';}
   else el.innerHTML='<span class="ll">Last payment</span><span class="lv">None recorded</span>';}
   const yr=(y,road)=>mine.filter(p=>+p[0].slice(0,4)===y&&((p[7]==='Road')===road)).reduce((a,p)=>a+p[2],0);
   const s={a:[yr(2025,false),yr(2026,false)],b:[yr(2025,true),yr(2026,true)]};
