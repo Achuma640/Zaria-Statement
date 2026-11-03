@@ -8,6 +8,7 @@
 :root[data-theme="dark"]{--bg:#101712;--card:#18221B;--fg:#E6EEE8;--mute:#9DB0A3;--green:#8FD1A5;--green2:#5FAE7C;--sage:#22332A;--gold:#D9B545;--cream:#2D2A18;--line:#2F4036;--bad:#FF8A8A;--badbg:#4A2326;--ok:#1F3A28;--okfg:#B7E6C4;--inp:#3A3716;color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;padding-inline:16px;padding-block:20px}
 .wrap{max-width:860px;margin:0 auto;background:var(--card);border:2px solid var(--gold);border-radius:6px;overflow:hidden;box-shadow:0 0 0 5px var(--card),0 0 0 6px var(--green2)}
+.last{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:12px 16px;padding:12px 16px;background:#FFD23F;color:#1B1500;border-radius:6px;border:2px solid #B8901A;font-weight:600}.last .ll{font-size:13px;letter-spacing:.08em;text-transform:uppercase}.last .lv{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}.last .la{font-size:15px;font-weight:600}
 [hidden]{display:none!important}#mp{display:block;width:100%;height:auto;background:#141414}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.hdr{background:#141414;display:flex;align-items:stretch;justify-content:space-between}.hl{width:42%;max-width:260px;height:auto;object-fit:contain;padding:10px 14px;box-sizing:border-box}.hp{width:52%;object-fit:cover;display:block}
 h1{font-family:var(--disp);font-style:italic;font-weight:700;font-size:clamp(34px,8vw,52px);margin:0;text-align:center;color:var(--green);line-height:1.1;padding-top:14px}
 .sub{text-align:center;color:var(--mute);letter-spacing:.12em;text-transform:uppercase;font-size:12px;margin:2px 0 0;padding-bottom:12px;border-bottom:2px solid var(--gold)}
@@ -62,6 +63,7 @@ button{font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--line)
 <div id="msg" class="msg">Enter a phone number or plot number above.</div>
 <div id="out" hidden>
 <dl class="id"><dt>Plot number</dt><dd id="plot"></dd><dt>Name</dt><dd id="name"></dd><dt>Status</dt><dd id="status"></dd></dl>
+<div id="lastpay" class="last"></div>
 <div class="bar"><span>Summary (KES)</span></div>
 <div class="scroll"><table class="sum"><thead><tr><th></th><th>2025</th><th>2026</th></tr></thead><tbody id="sum"></tbody></table></div>
 <div class="bar"><span>Service charge by month</span><span style="font-weight:400;font-size:12.5px">KES 5,000 a month, payable from May 2025</span></div>
@@ -125,6 +127,9 @@ function show(raw){
   const mine=D.P.filter(p=>p[5]===u||p[6]===u);
   msg.hidden=true;out.hidden=false;navMap(u);
   $('plot').textContent=u;$('name').textContent=info[0];$('status').textContent=info[1];
+  {const lp=mine.slice().sort((x,y)=>x[0]<y[0]?1:x[0]>y[0]?-1:0)[0];const el=$('lastpay');
+  if(lp){const dt=new Date(lp[0]+'T00:00:00');el.innerHTML='<span class="ll">Last payment</span><span class="lv">'+dt.getDate()+' '+MN[dt.getMonth()]+' '+dt.getFullYear()+'</span><span class="la">KES '+fmt(lp[2])+' · '+(lp[7]==='General'?'Service charge':lp[7]==='Road'?'Road':lp[7])+'</span>';}
+  else el.innerHTML='<span class="ll">Last payment</span><span class="lv">None recorded</span>';}
   const yr=(y,road)=>mine.filter(p=>+p[0].slice(0,4)===y&&((p[7]==='Road')===road)).reduce((a,p)=>a+p[2],0);
   const s={a:[yr(2025,false),yr(2026,false)],b:[yr(2025,true),yr(2026,true)]};
   $('sum').innerHTML=`<tr><td>Service charge &amp; AGM</td><td>${fmt(s.a[0])}</td><td>${fmt(s.a[1])}</td></tr><tr><td>Road contributions</td><td>${fmt(s.b[0])}</td><td>${fmt(s.b[1])}</td></tr><tr><td>TOTAL PAID</td><td>${fmt(s.a[0]+s.b[0])}</td><td>${fmt(s.a[1]+s.b[1])}</td></tr>`;
