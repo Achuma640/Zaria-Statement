@@ -123,11 +123,24 @@ function render(){
  h+='<div class="card latest"><h2>Latest transactions in this period</h2>'+(act.length?act.map(function(x){return '<div class="row '+(x.in_?'in':'outc')+'"><span><b>'+esc(x.w)+'</b><small>'+esc(x.x)+' &middot; '+dl(x.d)+', '+t12(x.t)+'</small></span><span class="a '+(x.in_?'in':'outc')+'">'+(x.in_?'+':'-')+fmt(x.a)+'</span></div>'}).join(''):'<div class="mut">None.</div>')+'</div>';
  // arrears by age
  h+='<div class="card"><h2>Arrears by months unpaid (to date)</h2>'+bk.map(function(b){var lab=b[1]>=99?b[0]+'+ months':b[0]===b[1]?b[0]+' month':b[0]+' to '+b[1]+' months';return '<div class="row"><span>'+lab+'<small>'+b[2]+' account'+(b[2]===1?'':'s')+'</small></span><span class="a">'+fmt(b[3])+'</span></div>'}).join('')+'<div class="mut" style="margin-top:6px">For any plot: open the receipts report and type the plot number. Tap All plots for the full list.</div></div>';
+ h+='<div class="card"><h2>Payment map, May 2025 to date</h2><canvas id="pm" style="width:100%;height:auto;display:block;border-radius:6px"></canvas><div class="key" id="pmk" style="margin-top:8px">Loading map...</div></div>';
  h+='<h2 style="margin:18px 0 8px;font-size:15px">Open the full reports</h2><a class="lnk" href="../receipts-r5m8xw/"><span class="ic">&#8681;</span><span class="tx"><b>Receipts report</b><span>Every receipt by plot, with plot balances, map and last payment</span></span><span class="go2">Tap to open &#8250;</span></a><a class="lnk lnk2" href="../treasurer-zv7k2q/"><span class="ic">&#8679;</span><span class="tx"><b>Expenditure report</b><span>Every payment by category, with 6-period averages and charts</span></span><span class="go2">Tap to open &#8250;</span></a>';
- document.getElementById('rep').innerHTML=h;
+ document.getElementById('rep').innerHTML=h;paintPM();
  [].forEach.call(document.querySelectorAll('[data-sp]'),function(b){b.onclick=function(){dd='sp';dcat=b.dataset.sp;dq='';render();window.scrollTo(0,0)}});
  [].forEach.call(document.querySelectorAll('[data-dd]'),function(b){b.onclick=function(){dd=b.dataset.dd;dq='';render();window.scrollTo(0,0)}});
 }
+var NV=null,NVP=null;function loadNav(cb){if(NV&&NVP)return cb(true);fetch('../receipts-r5m8xw/navp.json').then(function(r){return r.json()}).then(function(j){NVP=j;var im=new Image();im.onload=function(){NV=im;cb(true)};im.onerror=function(){cb(false)};im.src='../receipts-r5m8xw/nav.jpg'}).catch(function(){cb(false)})}
+function paintPM(){var c=document.getElementById('pm');if(!c)return;loadNav(function(ok){c=document.getElementById('pm');if(!c)return;if(ok)drawAll(c);else c.parentNode.innerHTML='<div class="mut">Map could not be loaded.</div>'})}
+function drawAll(c){
+ var ci=Math.min(curIdx(),18),W=NV.naturalWidth,k=1,H=Math.round(NV.naturalHeight*k);c.width=W;c.height=H;var g=c.getContext('2d');g.drawImage(NV,0,0,W,H);
+ var col={ok:['#1E8449','Up to date (paid to '+mlab(ci)+')'],b13:['#F1C40F','1 to 4 months unpaid'],b4:['#C0392B','5 or more months unpaid'],pur:['#4A148C','Living or building, never paid'],none:['#95A5A6','']},cnt={};
+ Object.keys(BAL.units).forEach(function(u){var U=BAL.units[u];if(!U)return;var lo=U.nd||0,un=0,any=false,kk;for(kk=0;kk<18;kk++)if(U.c[kk])any=true;for(kk=0;kk<8;kk++)if((U.ah&&U.ah[kk]||0)>0)any=true;
+  for(kk=lo;kk<=ci;kk++){var pd=kk<18?!!U.c[kk]:(((U.ah&&U.ah[kk-18])||0)>=5000);if(!pd)un++}
+  var t=!any?((U.s==='Resident'||U.s==='Building')?'pur':'none'):un===0?'ok':un<=4?'b13':'b4';
+  if(t==='none')return;var parts=u.split('-').filter(function(x){return NVP[x]});if(!parts.length)return;cnt[t]=(cnt[t]||0)+parts.length;
+  parts.forEach(function(n){g.beginPath();NVP[n].forEach(function(p,i){var X=p[0]*k,Y=p[1]*k;i?g.lineTo(X,Y):g.moveTo(X,Y)});g.closePath();g.globalAlpha=t==='pur'?.95:.85;g.fillStyle=col[t][0];g.fill();g.globalAlpha=1;g.lineWidth=2.5;g.strokeStyle='rgba(0,0,0,.6)';g.stroke()});parts.forEach(function(n){var m=CEN(NVP[n]);g.fillStyle=t==='b13'?'#000':'#fff';g.font='bold 24px Arial,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(n,m[0],m[1]-9);var sl=U.s==='Resident'?'R':U.s==='Building'?'B':'';if(sl){g.font='bold 22px Arial,sans-serif';g.fillText(sl,m[0],m[1]+14)}})});
+ var kd=document.getElementById('pmk');if(kd)kd.innerHTML=['pur','b4','b13','ok'].map(function(t){return '<div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span style="width:18px;height:18px;border-radius:4px;background:'+col[t][0]+';border:1px solid rgba(0,0,0,.4);flex:none"></span><span><b>'+col[t][1]+'</b>: '+(cnt[t]||0)+' plots</span></div>'}).join('')+'<div style="margin-top:6px">Counted from May 2025 to '+mlab(ci)+'. Uncoloured plots are not living or building and have never paid.</div>'}
+function CEN(q){var A=0,X=0,Y=0;for(var i=0;i<q.length;i++){var a=q[i],b=q[(i+1)%q.length],f=a[0]*b[1]-b[0]*a[1];A+=f;X+=(a[0]+b[0])*f;Y+=(a[1]+b[1])*f}A*=3;return A?[X/A,Y/A]:q[0]}
 function b2u(x){var s=atob(x),a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
 async function unlock(pin,remember){
  var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveKey']);
