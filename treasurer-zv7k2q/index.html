@@ -71,7 +71,7 @@ h2{font-size:16px;margin:2px 0 8px}
 .empty{padding:22px 14px;color:var(--mut);text-align:center}
 .foot{color:var(--mut);font-size:11.5px;margin-top:14px}
 .srch{width:100%;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font:inherit;padding:0 12px;margin-bottom:10px}
-</style></head><body><div class="wrap">
+.card{border-width:2px!important;border-style:solid!important;border-color:#8fa396!important}#fb{background:#0B3D91!important;color:#fff!important;border:2px solid #0B3D91!important;font-weight:800!important}#fb.on{box-shadow:0 0 0 2px var(--gold)}</style></head><body><div class="wrap">
 <h1>Zaria Village Treasurer Report</h1>
 <p class="sub" id="sub">Payments out of the Zaria Village collection account (1136).</p>
 <div id="gate"><form id="gform" class="card" style="padding:16px"><h2 style="margin:0 0 6px">Treasurers only</h2><p class="sub" style="margin:0 0 10px">Enter the PIN to open the report.</p><input class="srch" id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN" aria-label="PIN"><label style="display:flex;gap:8px;align-items:center;margin-bottom:10px;color:var(--mut)"><input type="checkbox" id="rem" checked> Remember on this phone</label><button class="back" type="submit" style="margin:0;background:var(--green);color:#fff;border-color:var(--green)">Open report</button><p id="gmsg" class="sub" style="margin:8px 0 0" role="status"></p></form></div>
@@ -79,7 +79,7 @@ h2{font-size:16px;margin:2px 0 8px}
 <div class="seg" id="seg" role="group" aria-label="Period type">
 <button data-m="day">Day</button><button data-m="month">Month</button><button data-m="quarter">Quarter</button><button data-m="year">Year</button><button data-m="all">All time</button></div>
 <div class="picker"><button id="prev" aria-label="Previous period">&#8249;</button><span id="pk" style="flex:1;display:flex;min-width:0"></span><button id="next" aria-label="Next period">&#8250;</button><span class="vt" id="vt" role="group" aria-label="Show as"><button data-v="list" aria-label="List" title="List"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></button><button data-v="graph" aria-label="Graph" title="Graph"><svg viewBox="0 0 24 24"><path d="M4 20V4h2v14h14v2zm4-4v-5h3v5zm5 0V7h3v9zm5 0v-3h3v3z"/></svg></button><button data-v="pie" aria-label="Pie chart" title="Pie chart"><svg viewBox="0 0 24 24"><path d="M11 3a9 9 0 1 0 9 9h-9zm2 0v8h8a8 8 0 0 0-8-8z"/></svg></button></span></div>
-<div class="opts"><button id="fb" class="fbtn" aria-expanded="false">Categories</button></div>
+<div class="opts"><button id="fb" class="fbtn" aria-expanded="false">Choose Category</button></div>
 <div id="fp" class="fpanel" hidden></div>
 <div id="view"></div>
 <p class="foot">Source: the treasurers' Transactions sheet. Amounts are in KES. M-Pesa charges are shown separately and are not included in a payment's amount. Tap an M-Pesa ref to copy it.</p>
@@ -195,7 +195,7 @@ function pieHtml(arr,tot){
 function draw(){
  [].forEach.call(document.querySelectorAll('#seg button'),function(b){b.setAttribute('aria-pressed',b.dataset.m===mode)});
  [].forEach.call(document.querySelectorAll('#sc button'),function(b){b.setAttribute('aria-pressed',b.dataset.s===sc)});
- var nOff=Object.keys(off).filter(function(k){return off[k]}).length,fb=document.getElementById('fb');fb.textContent=nOff?'Categories ('+(CATS.length-nOff)+' of '+CATS.length+')':'Categories (all)';fb.className='fbtn'+(nOff?' on':'');
+ var nOff=Object.keys(off).filter(function(k){return off[k]}).length,fb=document.getElementById('fb');fb.textContent=nOff?'Choose Category ('+(CATS.length-nOff)+' of '+CATS.length+')':'Choose Category (all)';fb.className='fbtn'+(nOff?' on':'');
  [].forEach.call(document.querySelectorAll('#vt button'),function(b){b.setAttribute('aria-pressed',b.dataset.v===vw)});
  buildPicker();
  var L=mode==='day'?null:periods(mode),i=L?L.indexOf(cur):0;
