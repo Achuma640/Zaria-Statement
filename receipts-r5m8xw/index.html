@@ -187,7 +187,7 @@ function shift(dir){if(mode==='day'){var d=new Date(cur+'T12:00:00');d.setDate(d
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function rowHtml(r,showCat){return '<div class="row"><div class="l1"><span class="who">'+esc(r[5])+'</span><span class="amt">'+fmt(r[3])+'</span></div>'+
  '<div class="why">'+esc(r[6]||'No description')+'</div><div class="meta"><span>'+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' '+r[0].slice(0,4)+', '+r[1]+'</span>'+
- '<button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button><span>Charge '+fmt(r[4])+'</span>'+(showCat?'<span>'+esc(r[7])+'</span>':'')+'</div></div>'}
+ '<button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button><span>M-Pesa charge '+fmt(r[4])+'</span>'+(showCat?'<span>'+esc(r[7])+'</span>':'')+'</div></div>'}
 
 
 function startDate(){return mode==='all'?'0000-00-00':mode==='day'?cur:mode==='month'?cur+'-01':mode==='quarter'?(function(){var b=cur.split('-Q');return b[0]+'-'+String((b[1]-1)*3+1).padStart(2,'0')+'-01'})():cur+'-01-01'}
@@ -262,7 +262,7 @@ function draw(){
   if(q){var qq=q.toLowerCase();list=list.filter(function(r){return (r[5]+' '+r[6]+' '+r[2]).toLowerCase().indexOf(qq)>-1})}
   var ct=list.reduce(function(a,r){return a+r[3]},0);
   v.innerHTML=plotCard()+'<button class="back" id="back">&#8249; All types</button><h2>'+esc(openCat==='__all'?'All receipts':openCat)+' <span style="color:var(--mut);font-weight:400">'+pLabel()+'</span></h2>'+
-  '<div class="tiles"><div class="tile main"><small>Total</small><b>KES '+fmt(ct)+'</b></div><div class="tile"><small>Receipts</small><b>'+list.length+'</b></div><div class="tile"><small>Charges</small><b>'+fmt(list.reduce(function(a,r){return a+r[4]},0))+'</b></div></div>'+
+  '<div class="tiles"><div class="tile main"><small>Total</small><b>KES '+fmt(ct)+'</b></div><div class="tile"><small>Receipts</small><b>'+list.length+'</b></div><div class="tile"><small>M-Pesa Charges</small><b>'+fmt(list.reduce(function(a,r){return a+r[4]},0))+'</b></div></div>'+
   '<p class="avg">'+(openCat==='__all'?avgLine(AV,ct,null):avgLine(AV,ct,openCat))+'</p>'+'<input class="srch" id="srch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">'+
   '<div class="card">'+(list.length?list.map(function(r){return rowHtml(r,openCat==='__all')}).join(''):'<div class="empty">No receipts match.</div>')+'</div>';
   document.getElementById('back').onclick=function(){openCat=null;q='';draw()};
