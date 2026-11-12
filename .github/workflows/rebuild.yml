@@ -2,7 +2,8 @@ name: Rebuild reports from the Sheet
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 */3 * * *"
+    # UTC; Nairobi is UTC+3, so 05-19 UTC = 08:00-22:xx. tools/should_run.py decides which ticks actually run.
+    - cron: "5,35 5-19 * * *"
 permissions:
   contents: write
 concurrency: rebuild
@@ -11,26 +12,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - id: gate
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; else python3 tools/should_run.py; fi
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with: { python-version: "3.12" }
-      - run: pip install cryptography google-auth requests pillow
-      - name: Fetch Sheet data
+      - if: steps.gate.outputs.run == 'true'
+        run: pip install cryptography google-auth requests pillow
+      - if: steps.gate.outputs.run == 'true'
+        name: Fetch Sheet data
         env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
         run: python3 tools/fetch_sheet.py "$RUNNER_TEMP/sheet"
-      - name: Apply new receipts to plots
+      - if: steps.gate.outputs.run == 'true'
+        name: Apply new receipts to plots
         env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
         run: |
           python3 tools/allocate.py --tx "$RUNNER_TEMP/sheet/transactions.json" --sc "$RUNNER_TEMP/sheet/service_charge.json" --out "$RUNNER_TEMP/plan.json"
           python3 tools/apply_plan.py "$RUNNER_TEMP/plan.json"
           python3 tools/fetch_sheet.py "$RUNNER_TEMP/sheet"
-      - name: Rebuild locked pages
+      - if: steps.gate.outputs.run == 'true'
+        name: Rebuild locked pages
         env: { ZARIA_PIN: "${{ secrets.ZARIA_PIN }}" }
         run: |
           python3 tools/refresh_committee.py "$RUNNER_TEMP/sheet/transactions.json" --sc "$RUNNER_TEMP/sheet/service_charge.json" --write
           python3 tools/sync_pages.py --write
           python3 tools/refresh_statement.py "$RUNNER_TEMP/sheet/transactions.json" "$RUNNER_TEMP/sheet/service_charge.json" --write
           python3 tools/make_map_page.py
-      - name: Commit if changed
+      - if: steps.gate.outputs.run == 'true'
+        name: Commit if changed
         run: |
           git diff --quiet && echo "No changes" && exit 0
           git config user.name "zaria-rebuild"; git config user.email "actions@users.noreply.github.com"
