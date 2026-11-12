@@ -34,11 +34,14 @@ Everything else (GitHub pages, Excel files, payment-map PDFs, residents deck, fl
 - `nov-committee-zv/`, `nov-update-zv/`: November pages (last built 6 Nov).
 - Record layouts: receipt `[date,time,ref,amount,charge,who,'Plot N',category]`; payment `[date,time,ref,amount,charge,payee,description,category]`; `b.days` = `[date,in,out,time]`, balance = 446378 + sum(in - out).
 
-## What a rebuild needs (the gap)
-The coverage flags in the Sheet are *stored results*, not live formulas: after new receipts arrive, someone must apply them oldest-unpaid-first and write the flags and credit. The allocator script was lost with an earlier workspace reset and is not yet rebuilt. `tools/check_sync.py` verifies the Sheet against the published pages so drift is caught.
+## Applying new receipts (the allocator)
+`tools/allocate.py` applies NEW General receipts to the oldest unpaid month first and prints a plan of Sheet cell updates (it never writes to the Sheet itself). Tests: `python3 tools/test_allocate.py`.
+- Transactions column R ("Applied") is blank for rows not yet applied; every row up to 11 Nov 2026 is marked `legacy`. After applying, write the plan's `Applied: ...` text into R so a receipt is never applied twice.
+- Service Charge column BU ("Carry (KES)") holds a partial remainder (e.g. 2,500 toward the next month). Flags are `AY:BQ`.
+- Steps for "update all": (1) paste the Tendepay CSV into Tendepay Import / To Add and move the new rows to Transactions (never touch P or Q); (2) export `Transactions!A1:R1000` and `'Service Charge'!A7:BU90`; (3) run `allocate.py` and write its updates; (4) rebuild the outputs.
 
 ## Open items (12 Nov 2026)
-- Allocator and page builders to be rebuilt as scripts in `tools/` (so any Claude or a GitHub Action can run them).
+- Page builders (statement, locked reports, Excel, map) still to be rebuilt as scripts in `tools/`; the allocator is done.
 - November pages (`nov-*`), names-map PDF, interactive map artifacts, and committee members PDF are not regenerated.
 - Plot 236 phone numbers; plots 77, 269, 276 names (no payments yet); plot 262 owner.
 - Transactions!Q2 shows #REF! (first data row only).
