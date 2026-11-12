@@ -28,6 +28,7 @@ jobs:
         run: |
           python3 tools/refresh_committee.py "$RUNNER_TEMP/sheet/transactions.json" --sc "$RUNNER_TEMP/sheet/service_charge.json" --write
           python3 tools/sync_pages.py --write
+          python3 tools/refresh_statement.py "$RUNNER_TEMP/sheet/transactions.json" "$RUNNER_TEMP/sheet/service_charge.json" --write
       - name: Commit if changed
         run: |
           git diff --quiet && echo "No changes" && exit 0
