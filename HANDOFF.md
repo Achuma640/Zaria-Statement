@@ -42,7 +42,7 @@ Everything else (GitHub pages, Excel files, payment-map PDFs, residents deck, fl
 
 ## Page tools
 - `tools/zcrypto.py` decrypts/re-encrypts the locked pages (PIN via `ZARIA_PIN`, never stored).
-- `tools/refresh_committee.py transactions.json [--write]` adds only NEW refs to the committee page lists (0 new today). It does not yet rebuild the `b` block (balances/map/units), the treasurer and receipts pages, statement `D`, Excel or PDFs.
+- `tools/refresh_committee.py transactions.json [--sc service_charge.json] [--write]` adds only NEW refs to the committee page lists, rebuilds the daily balance and (with --sc) refreshes unit coverage/credit/not-due. Dry-run by default; 0 differences today. It does not yet rebuild the `b` block (balances/map/units), the treasurer and receipts pages, statement `D`, Excel or PDFs.
 
 ## Open items (12 Nov 2026)
 - Page builders (statement, locked reports, Excel, map) still to be rebuilt as scripts in `tools/`; the allocator is done.

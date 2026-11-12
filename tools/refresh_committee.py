@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Add NEW Sheet transactions to the committee page's p (payments) / r (receipts) lists.
 
-Usage: ZARIA_PIN=... python3 tools/refresh_committee.py transactions.json [--write]
+Usage: ZARIA_PIN=... python3 tools/refresh_committee.py transactions.json [--sc service_charge.json] [--write]
 Only refs not already on the page are added (page data holds curated names and
 splits that the Sheet does not, so a full regeneration would lose them).
 Dry-run by default. Also rebuilds b.days (daily balance) from the Sheet. b.units/map not yet.
@@ -34,6 +34,26 @@ def days(rows):
         e[0] += i; e[1] += o; e[2] = max(e[2], d.strftime("%H:%M"))
     return [[k, round(e[0], 2), round(e[1], 2), e[2]] for k, e in sorted(A.items())]
 
+def _f(x):
+    x = str(x).replace(",", "")
+    return float(x) if x.replace(".", "").lstrip("-").isdigit() else 0.0
+
+def units(U, sc):
+    """Refresh coverage c (18 months May25-Oct26), credit cr and not-due nd from the Service Charge export
+    ('Service Charge'!A7:BU80). Names n, status s and notes t are kept. Returns the changed unit keys."""
+    changed = []
+    for r in sc:
+        r = r + [""] * (73 - len(r))
+        u = U.get(str(r[0]))
+        if not u:
+            print("unit not on page:", r[0]); continue
+        nd = int(_f(r[71]) or 1) - 1
+        c = [1 if str(x).upper() == "TRUE" and i >= nd else 0 for i, x in enumerate(r[50:68])]
+        cr = _f(r[22])
+        if (u["c"], u["nd"], u["cr"]) != (c, nd, cr):
+            u["c"], u["nd"], u["cr"] = c, nd, cr; changed.append(r[0])
+    return changed
+
 def main():
     pin = os.environ.get("ZARIA_PIN") or sys.exit("set ZARIA_PIN")
     path = "committee-q4n7vd/index.html"
@@ -50,6 +70,9 @@ def main():
     nd = days(rows)
     close = lambda dd: round(C["b"]["open"] + sum(x[1] - x[2] for x in dd), 2)
     print("closing balance: page %.2f -> sheet %.2f" % (close(C["b"]["days"]), close(nd)))
+    if "--sc" in sys.argv:
+        ch = units(C["b"]["units"], json.load(open(sys.argv[sys.argv.index("--sc") + 1]))["values"])
+        print("units changed:", ch)
     if "--write" in sys.argv:
         C["b"]["days"] = nd
         C["p"] = sorted(C["p"] + new["Payment"], key=lambda x: (x[0], x[1]), reverse=True)
