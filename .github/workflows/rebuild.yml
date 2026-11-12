@@ -1,0 +1,29 @@
+name: Rebuild reports from the Sheet
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */3 * * *"
+permissions:
+  contents: write
+concurrency: rebuild
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install cryptography google-auth requests
+      - name: Fetch Sheet data
+        env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
+        run: python3 tools/fetch_sheet.py "$RUNNER_TEMP/sheet"
+      - name: Rebuild locked pages
+        env: { ZARIA_PIN: "${{ secrets.ZARIA_PIN }}" }
+        run: |
+          python3 tools/refresh_committee.py "$RUNNER_TEMP/sheet/transactions.json" --sc "$RUNNER_TEMP/sheet/service_charge.json" --write
+          python3 tools/sync_pages.py --write
+      - name: Commit if changed
+        run: |
+          git diff --quiet && echo "No changes" && exit 0
+          git config user.name "zaria-rebuild"; git config user.email "actions@users.noreply.github.com"
+          git add -A; git commit -m "Auto-rebuild from Sheet"; git push

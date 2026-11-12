@@ -58,6 +58,7 @@ def main():
     pin = os.environ.get("ZARIA_PIN") or sys.exit("set ZARIA_PIN")
     path = "committee-q4n7vd/index.html"
     html, m, C = zcrypto.load(path, pin)
+    before = json.dumps(C, sort_keys=True)
     rows = [r + [""] * (18 - len(r)) for r in json.load(open(sys.argv[1]))["values"][1:]]
     have = {x[2].split("_")[0] for x in C["p"] + C["r"]}
     new = {"Payment": [], "Receipt": []}
@@ -77,8 +78,11 @@ def main():
         C["b"]["days"] = nd
         C["p"] = sorted(C["p"] + new["Payment"], key=lambda x: (x[0], x[1]), reverse=True)
         C["r"] = sorted(C["r"] + new["Receipt"], key=lambda x: (x[0], x[1]), reverse=True)
-        zcrypto.save(path, html, m, C, pin)
-        print("written")
+        if json.dumps(C, sort_keys=True) == before:
+            print("no change; page left as is")
+        else:
+            zcrypto.save(path, html, m, C, pin)
+            print("written")
 
 if __name__ == "__main__":
     main()
