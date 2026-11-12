@@ -40,6 +40,9 @@ Everything else (GitHub pages, Excel files, payment-map PDFs, residents deck, fl
 - Service Charge column BU ("Carry (KES)") holds a partial remainder (e.g. 2,500 toward the next month). Flags are `AY:BQ`.
 - Steps for "update all": (1) paste the Tendepay CSV into Tendepay Import / To Add and move the new rows to Transactions (never touch P or Q); (2) export `Transactions!A1:R1000` and `'Service Charge'!A7:BU90`; (3) run `allocate.py` and write its updates; (4) rebuild the outputs.
 
+## Automatic rebuild (GitHub Action "Rebuild reports from the Sheet", every 3 h or manual)
+fetch Sheet (service account, secret GOOGLE_SA_KEY) -> `allocate.py` -> `apply_plan.py` (writes R / flags / BU; refuses >40 receipts) -> re-fetch -> `refresh_committee.py --write` -> `sync_pages.py --write` -> commit if changed. Receipts with no plot are retried next run; a plot missing from the Service Charge tab gets `REVIEW: ...` in column R for a person to fix. Not automated yet: statement page, Excel, PDFs.
+
 ## Page tools
 - `tools/sync_pages.py [--write]` copies the committee payload into the treasurer and receipts pages (run after refresh_committee --write).
 - `tools/zcrypto.py` decrypts/re-encrypts the locked pages (PIN via `ZARIA_PIN`, never stored).

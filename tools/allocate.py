@@ -18,6 +18,7 @@ from datetime import datetime
 MONTHS = ["May 25","Jun 25","Jul 25","Aug 25","Sep 25","Oct 25","Nov 25","Dec 25","Jan 26",
           "Feb 26","Mar 26","Apr 26","May 26","Jun 26","Jul 26","Aug 26","Sep 26","Oct 26","Nov 26"]
 FLAG0, RCVD0 = 50, 30          # 0-based column index of AY (May 25 flag) and AE (May 25 received)
+NOT_CHARGED = {"106", "148", "156"}   # plots that are never charged service charge
 COL_BT, COL_BU = 71, 72        # 0-based index of BT (first month due) and BU (carry)
 
 
@@ -70,6 +71,10 @@ def plan(tx_rows, sc_rows, first_sc_row=7, tx_first_row=2):
             applied.append((rowno, r[1], "skipped: no plot"))
             continue
         key = plot_to_unit.get(str(r[7]).strip()) or (r[16] if r[16] in units else None)
+        if not key and str(r[7]).strip() in NOT_CHARGED:
+            writes.append(dict(range="Transactions!R%d" % rowno, values=[["not charged"]]))
+            applied.append((rowno, r[1], "plot %s not charged" % r[7]))
+            continue
         if not key:                      # unknown plot: leave a visible flag for a person
             lab = "REVIEW: plot %s not on Service Charge tab" % r[7]
             applied.append((rowno, r[1], lab))
