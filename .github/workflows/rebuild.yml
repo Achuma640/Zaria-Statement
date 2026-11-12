@@ -17,6 +17,12 @@ jobs:
       - name: Fetch Sheet data
         env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
         run: python3 tools/fetch_sheet.py "$RUNNER_TEMP/sheet"
+      - name: Apply new receipts to plots
+        env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
+        run: |
+          python3 tools/allocate.py --tx "$RUNNER_TEMP/sheet/transactions.json" --sc "$RUNNER_TEMP/sheet/service_charge.json" --out "$RUNNER_TEMP/plan.json"
+          python3 tools/apply_plan.py "$RUNNER_TEMP/plan.json"
+          python3 tools/fetch_sheet.py "$RUNNER_TEMP/sheet"
       - name: Rebuild locked pages
         env: { ZARIA_PIN: "${{ secrets.ZARIA_PIN }}" }
         run: |

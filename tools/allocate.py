@@ -66,10 +66,14 @@ def plan(tx_rows, sc_rows, first_sc_row=7, tx_first_row=2):
             todo.append((datetime.strptime(r[0], "%d-%b-%Y %H:%M"), tx_first_row + i, r))
     todo.sort(key=lambda t: t[0])
     for _, rowno, r in todo:
+        if not str(r[7]).strip():       # no plot yet (row still being typed): retry next run
+            applied.append((rowno, r[1], "skipped: no plot"))
+            continue
         key = plot_to_unit.get(str(r[7]).strip()) or (r[16] if r[16] in units else None)
-        if not key:
-            applied.append((rowno, r[1], "no charged unit for plot %s" % r[7]))
-            writes.append(dict(range="Transactions!R%d" % rowno, values=[["not charged"]]))
+        if not key:                      # unknown plot: leave a visible flag for a person
+            lab = "REVIEW: plot %s not on Service Charge tab" % r[7]
+            applied.append((rowno, r[1], lab))
+            writes.append(dict(range="Transactions!R%d" % rowno, values=[[lab]]))
             continue
         u = units[key]
         if u["status"] not in ("Resident", "Building"):
@@ -94,10 +98,10 @@ def plan(tx_rows, sc_rows, first_sc_row=7, tx_first_row=2):
     for k, u in units.items():
         for m in range(19):
             if u["flags"][m] != u["flags0"][m]:
-                writes.append(dict(range="Service Charge!%s%d" % (col(FLAG0 + m), u["row"]),
+                writes.append(dict(range="'Service Charge'!%s%d" % (col(FLAG0 + m), u["row"]),
                                    values=[[u["flags"][m]]]))
         if abs(u["carry"] - u["carry0"]) > 0.001:
-            writes.append(dict(range="Service Charge!%s%d" % (col(COL_BU), u["row"]),
+            writes.append(dict(range="'Service Charge'!%s%d" % (col(COL_BU), u["row"]),
                                values=[[u["carry"]]]))
     return writes, applied
 
