@@ -50,6 +50,11 @@ def units(U, sc):
         nd = int(_f(r[71]) or 1) - 1
         c = [1 if str(x).upper() == "TRUE" and i >= nd else 0 for i, x in enumerate(r[50:68])]
         cr = _f(r[22])
+        rate = 5500 if any(abs(_f(x) - 5500) < 1 for x in r[30:49]) else 5000
+        if u.get("ah") and str(r[68]).upper() == "TRUE":       # credit beyond Nov 26 -> paid-ahead months
+            for j in range(1, min(int(_f(r[72]) // rate), 13) + 1):
+                if u["ah"][j] == 0:
+                    u["ah"][j] = rate; changed.append(r[0])
         if (u["c"], u["nd"], u["cr"]) != (c, nd, cr):
             u["c"], u["nd"], u["cr"] = c, nd, cr; changed.append(r[0])
     return changed

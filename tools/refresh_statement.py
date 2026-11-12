@@ -54,6 +54,35 @@ def update(D, tx, sc, log=print):
                 if i < 18: v["disp"][i] = rate
                 else: v["ahead"][i - 18] = rate
                 log("plot", row[0], "month", i, "newly covered")
+    newahead = {}
+    for row in sc:                         # credit beyond the last Sheet month (Nov 26) -> paid-ahead months
+        row = row + [""] * (73 - len(row))
+        v = V.get(row[0])
+        if not v or not v["cov"][18]:
+            continue
+        rcvd = [num(x) for x in row[30:49]]
+        rate = 5500 if any(abs(x - 5500) < 1 for x in rcvd) else 5000
+        n = int(num(row[72]) // rate)
+        for j in range(1, min(n, 13) + 1):
+            if v["ahead"][j] == 0:
+                v["ahead"][j] = rate
+                newahead.setdefault(row[0], []).append(18 + j)
+                log("plot", row[0], "paid ahead month", 18 + j)
+    seen = " ".join(n[2] for n in N)
+    plot_unit = {p: k for k in V for p in k.split("-")}
+    for r in tx:                           # note for each held-credit receipt that now shows as paid ahead
+        r = r + [""] * (18 - len(r))
+        if r[2] != "Receipt" or not r[17].startswith("Held as credit") or r[1] in seen:
+            continue
+        k = plot_unit.get(str(r[7]).strip())
+        if k not in newahead:
+            continue
+        d = dt.datetime.strptime(r[0], "%d-%b-%Y %H:%M"); i = newahead[k][0]
+        mo = "%s %d" % (MONTHS[(4 + i) % 12], 2025 + (4 + i) // 12)
+        N.append([k, "%s %d" % (MONTHS[d.month - 1], d.year),
+                  "Received KES %s on %d %s %d (ref %s); KES %s is paid ahead for %s onward."
+                  % ("{:,}".format(int(num(r[3]))), d.day, MONTHS[d.month - 1], d.year, r[1], "{:,}".format(int(num(r[3]))), mo)])
+        log("note added for", r[1])
     for d, r in new:                       # receipt arrived in a month but was applied to older months
         mi = (d.year - 2025) * 12 + d.month - 5
         v = V.get(str(r[7]))
