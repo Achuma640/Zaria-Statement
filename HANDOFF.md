@@ -41,6 +41,7 @@ Everything else (GitHub pages, Excel files, payment-map PDFs, residents deck, fl
 - Steps for "update all": (1) paste the Tendepay CSV into Tendepay Import / To Add and move the new rows to Transactions (never touch P or Q); (2) export `Transactions!A1:R1000` and `'Service Charge'!A7:BU90`; (3) run `allocate.py` and write its updates; (4) rebuild the outputs.
 
 ## Page tools
+- `tools/sync_pages.py [--write]` copies the committee payload into the treasurer and receipts pages (run after refresh_committee --write).
 - `tools/zcrypto.py` decrypts/re-encrypts the locked pages (PIN via `ZARIA_PIN`, never stored).
 - `tools/refresh_committee.py transactions.json [--sc service_charge.json] [--write]` adds only NEW refs to the committee page lists, rebuilds the daily balance and (with --sc) refreshes unit coverage/credit/not-due. Dry-run by default; 0 differences today. It does not yet rebuild the `b` block (balances/map/units), the treasurer and receipts pages, statement `D`, Excel or PDFs.
 
