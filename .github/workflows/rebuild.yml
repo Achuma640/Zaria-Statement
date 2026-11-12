@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install cryptography google-auth requests
+      - run: pip install cryptography google-auth requests pillow
       - name: Fetch Sheet data
         env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
         run: python3 tools/fetch_sheet.py "$RUNNER_TEMP/sheet"
@@ -29,6 +29,7 @@ jobs:
           python3 tools/refresh_committee.py "$RUNNER_TEMP/sheet/transactions.json" --sc "$RUNNER_TEMP/sheet/service_charge.json" --write
           python3 tools/sync_pages.py --write
           python3 tools/refresh_statement.py "$RUNNER_TEMP/sheet/transactions.json" "$RUNNER_TEMP/sheet/service_charge.json" --write
+          python3 tools/make_map_page.py
       - name: Commit if changed
         run: |
           git diff --quiet && echo "No changes" && exit 0
