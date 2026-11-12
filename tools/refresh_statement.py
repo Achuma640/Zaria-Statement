@@ -65,7 +65,7 @@ if __name__ == "__main__":
     html = open("index.html").read()
     m = re.search(r"const D=(\{.*?\});\s*\n", html, re.S)
     D = json.loads(m.group(1))
-    tx = json.load(open(sys.argv[1]))["values"][1:]
+    tx = [r for r in json.load(open(sys.argv[1]))["values"][1:] if r and re.match(r"^\d{2}-\w{3}-\d{4} \d{2}:\d{2}$", r[0])]
     update(D, tx, json.load(open(sys.argv[2]))["values"])
     out = html[:m.start(1)] + json.dumps(D, separators=(",", ":"), ensure_ascii=False) + html[m.end(1):]
     last = max(dt.datetime.strptime(r[0], "%d-%b-%Y %H:%M") for r in tx if r and r[0])

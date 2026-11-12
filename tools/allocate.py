@@ -64,7 +64,13 @@ def plan(tx_rows, sc_rows, first_sc_row=7, tx_first_row=2):
     for i, r in enumerate(tx_rows):
         r = r + [""] * (18 - len(r))
         if r[2] == "Receipt" and r[9] == "General" and not r[17]:
-            todo.append((datetime.strptime(r[0], "%d-%b-%Y %H:%M"), tx_first_row + i, r))
+            try:
+                when = datetime.strptime(r[0], "%d-%b-%Y %H:%M")
+            except ValueError:   # e.g. "########" pasted from a too-narrow Excel column: flag it, keep going
+                lab = "REVIEW: date missing or not readable (%s)" % r[0]
+                applied.append((tx_first_row + i, r[1], lab))   # not written: retried once the date is fixed
+                continue
+            todo.append((when, tx_first_row + i, r))
     todo.sort(key=lambda t: t[0])
     for _, rowno, r in todo:
         if not str(r[7]).strip():       # no plot yet (row still being typed): retry next run

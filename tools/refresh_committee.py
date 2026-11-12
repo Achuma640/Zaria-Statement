@@ -6,7 +6,7 @@ Only refs not already on the page are added (page data holds curated names and
 splits that the Sheet does not, so a full regeneration would lose them).
 Dry-run by default. Also rebuilds b.days (daily balance) from the Sheet. b.units/map not yet.
 """
-import datetime as dt, json, os, sys
+import datetime as dt, json, os, re, sys
 sys.path.insert(0, os.path.dirname(__file__))
 import zcrypto
 
@@ -60,6 +60,9 @@ def main():
     html, m, C = zcrypto.load(path, pin)
     before = json.dumps(C, sort_keys=True)
     rows = [r + [""] * (18 - len(r)) for r in json.load(open(sys.argv[1]))["values"][1:]]
+    bad = [r[1] for r in rows if not re.match(r"^\d{2}-\w{3}-\d{4} \d{2}:\d{2}$", r[0]) and r[1]]
+    if bad: print("SKIPPED rows with unreadable dates (fix in the Sheet):", bad)
+    rows = [r for r in rows if re.match(r"^\d{2}-\w{3}-\d{4} \d{2}:\d{2}$", r[0])]
     have = {x[2].split("_")[0] for x in C["p"] + C["r"]}
     new = {"Payment": [], "Receipt": []}
     for r in rows:
