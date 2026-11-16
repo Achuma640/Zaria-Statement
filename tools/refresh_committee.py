@@ -40,13 +40,15 @@ def _f(x):
 
 def units(U, sc):
     """Refresh coverage c (18 months May25-Oct26), credit cr and not-due nd from the Service Charge export
-    ('Service Charge'!A7:BU80). Names n, status s and notes t are kept. Returns the changed unit keys."""
+    ('Service Charge'!A7:BU81). Names n, status s and notes t are kept. Returns the changed unit keys."""
     changed = []
     for r in sc:
         r = r + [""] * (73 - len(r))
         u = U.get(str(r[0]))
-        if not u:
-            print("unit not on page:", r[0]); continue
+        if not u:                       # a new unit added to the Service Charge tab: add it to the page
+            if not str(r[0]).strip(): continue
+            u = U[str(r[0])] = {"n": str(r[1]), "s": r[2], "t": "", "c": [0] * 18, "cr": 0, "nd": 0, "ah": [0] * 14}
+            changed.append(r[0]); print("new unit added to page:", r[0])
         nd = int(_f(r[71]) or 1) - 1
         c = [1 if str(x).upper() == "TRUE" and i >= nd else 0 for i, x in enumerate(r[50:68])]
         cr = _f(r[22])
@@ -83,6 +85,11 @@ def main():
     print("closing balance: page %.2f -> sheet %.2f" % (close(C["b"]["days"]), close(nd)))
     if "--sc" in sys.argv:
         ch = units(C["b"]["units"], json.load(open(sys.argv[sys.argv.index("--sc") + 1]))["values"])
+        mp = C["b"].get("map")
+        if isinstance(mp, dict) and mp and all(isinstance(x, str) for x in list(mp.values())[:20]):
+            for k in set(ch):                      # plots of newly added units
+                for pl in k.split("-") + [k]:
+                    if k in C["b"]["units"] and pl not in mp: mp[pl] = k
         print("units changed:", ch)
     if "--write" in sys.argv:
         C["b"]["days"] = nd

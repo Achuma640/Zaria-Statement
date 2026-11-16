@@ -40,6 +40,12 @@ def update(D, tx, sc, log=print):
     for row in sc:
         row = row + [""] * (73 - len(row))
         v = V.get(row[0])
+        if not v and str(row[0]).strip():      # a new unit added to the Service Charge tab
+            nd0 = int(num(row[71]) or 1) - 1
+            V[row[0]] = v = {"cov": [0] * 19, "credit": 0.0, "rec": [0] * 14, "master": 0, "disp": [0] * 18, "ahead": [0] * 14}
+            if nd0: v["nd"] = nd0
+            D["U"][row[0]] = [str(row[1]), row[2]]
+            log("new unit added to statement page:", row[0])
         if not v:
             log("unit not on statement page:", row[0]); continue
         nd = int(num(row[71]) or 1) - 1
