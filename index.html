@@ -244,7 +244,7 @@ $('theme').addEventListener('click',()=>{const r=document.documentElement;const 
    Switched on for everyone when ESTATE_ON is true; add ?estate=1 to the address to preview it first.
    FORMS_URL is the address of the small Netlify site that receives submissions (see netlify-forms/). */
 (function(){
-  var ESTATE_ON=false, FORMS_URL='';
+  var ESTATE_ON=false, FORMS_URL='https://zariap.netlify.app';
   var on=ESTATE_ON||/[?&]estate=1/.test(location.search);
   if(!on)return;
   var tabs=document.getElementById('etabs'),est=document.getElementById('estate'),tog=document.querySelector('.tog'),wrap=document.querySelector('.wrap');
