@@ -263,7 +263,7 @@ $('theme').addEventListener('click',()=>{const r=document.documentElement;const 
   var TILES=[['idea','💡','Share an idea','Suggest a project for the estate'],['volunteer','🙋','Volunteer','Offer your time or skills'],['issue','📷','Report an issue','With photos: roads, lights, water'],['news','📅','Meetings and notices','Next meeting, minutes, rules']];
   function draw(){
     if(view==='home'){est.innerHTML='<div class="hero"><b>Zaria Village</b><span>Your say in the estate. Tap to get involved.</span></div><div class="grid">'+TILES.map(function(t){return '<button class="tile" data-v="'+t[0]+'"><i>'+t[1]+'</i><b>'+t[2]+'</b><small>'+t[3]+'</small></button>'}).join('')+'</div>'+sponsors();
-      [].forEach.call(est.querySelectorAll('[data-v]'),function(b){b.onclick=function(){view=b.dataset.v;draw();window.scrollTo(0,0)}});return}
+      [].forEach.call(est.querySelectorAll('[data-v]'),function(b){b.onclick=function(){var v=b.dataset.v;if(FORMS_URL&&v!=='news'){location.href=FORMS_URL.replace(/\/+$/,'')+'/#'+v;return}view=v;draw();window.scrollTo(0,0)}});return}
     var back='<button class="back" id="eb">&#8249; Back</button>';
     if(view==='news'){var m=DATA.meetings||[],n=DATA.notices||[];
       est.innerHTML=back+'<h2>Meetings and notices</h2>'+(m.length?m.map(function(x){var l=safe(x.link);return '<div class="card"><b>'+q(x.title)+'</b><small>'+q(x.when||'')+'</small><div style="margin-top:4px">'+q(x.where||'')+'</div>'+(x.note?'<div style="margin-top:4px;color:var(--mute);font-size:13px">'+q(x.note)+'</div>':'')+(l?'<div style="margin-top:6px"><a href="'+q(l)+'" target="_blank" rel="noopener">Open link</a></div>':'')+'</div>'}).join(''):'<div class="card">No meetings announced yet.</div>')+

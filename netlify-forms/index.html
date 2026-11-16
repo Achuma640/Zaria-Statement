@@ -1,8 +1,26 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Zaria Village forms</title></head>
-<body>
-<p>This site only receives submissions from the Zaria Village statement app. Nothing to see here.</p>
-<!-- Netlify finds these forms when the site is deployed. Field names must match the app (see estate-forms in index.html). -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><meta name="theme-color" content="#14532D"><title>Zaria Village: get involved</title>
+<style>
+:root{--bg:#EEF3EC;--card:#fff;--fg:#1F2A24;--mute:#5F6F66;--green:#1E5631;--gold:#C9A227;--line:#C9D4CC;--inp:#FFF7C2;--ok:#E2EFDA;--okfg:#1E5631;--bad:#C00000;--badbg:#FFC7CE;--on:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#101712;--card:#18221B;--fg:#E6EEE8;--mute:#9DB0A3;--green:#8FD1A5;--gold:#D9B545;--line:#2F4036;--inp:#3A3716;--ok:#1F3A28;--okfg:#B7E6C4;--bad:#FF8A8A;--badbg:#4A2326;--on:#0F1A13}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:14px 16px 40px}
+.w{max-width:640px;margin:0 auto}.top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+a.back{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-weight:700;text-decoration:none;font-size:14px}
+h1{font-size:21px;margin:4px 0 6px;color:var(--green)}label{display:block;font-weight:700;font-size:14px;color:var(--green);margin:13px 0 4px}
+input[type=text],input[type=tel],textarea{width:100%;background:var(--inp);color:var(--fg);border:2px solid var(--gold);border-radius:8px;padding:10px;font:16px system-ui}textarea{min-height:100px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:18px;padding:8px 13px;font:600 14px system-ui;cursor:pointer;min-height:40px}
+.chip[aria-pressed=true]{background:var(--green);color:var(--on);border-color:var(--green)}
+.photos{display:flex;gap:8px}.ph{width:88px;height:88px;border-radius:10px;border:2px dashed var(--line);background:var(--card);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.ph input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.go{display:block;width:100%;min-height:50px;margin-top:18px;border:0;border-radius:10px;background:var(--green);color:var(--on);font:700 17px system-ui;cursor:pointer}.go[disabled]{opacity:.55}
+.msg{margin-top:12px;padding:11px 12px;border-radius:8px;font-size:15px}.msg.ok{background:var(--ok);color:var(--okfg)}.msg.bad{background:var(--badbg);color:var(--bad)}
+.note{font-size:12.5px;color:var(--mute);margin-top:10px}.hp{position:absolute;left:-9999px;height:0;overflow:hidden}.done{text-align:center;padding:30px 10px}.done h1{font-size:24px}
+</style></head><body><div class="w">
+<div class="top"><a class="back" id="bk" href="https://statement.zariavillage.co.ke/#estate">&#8249; Back to Zaria Village</a></div>
+<div id="root"></div></div>
+
+<!-- Forms Netlify detects when the site is deployed. Field names must match the page script below. -->
 <form name="idea" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
   <input name="bot-field"><input name="name"><input name="contact"><input name="title"><textarea name="details"></textarea>
 </form>
@@ -13,4 +31,36 @@
   <input name="bot-field"><input name="category"><input name="location"><textarea name="description"></textarea><input name="contact">
   <input type="file" name="photo1"><input type="file" name="photo2"><input type="file" name="photo3">
 </form>
-</body></html>
+
+<script>
+(function(){
+var root=document.getElementById('root'),view=(location.hash||'').replace('#','');
+var T={idea:'Share an idea',volunteer:'Volunteer',issue:'Report an issue'};
+var CH={issue:['Road or drainage','Street light','Water','Security','Waste','Other'],volunteer:['Cleaning and greening','Security watch','Events','Technical or building','Accounts and admin','Other']};
+function chips(n,one){return '<div class="chips" data-for="'+n+'"'+(one?' data-one="1"':'')+'>'+CH[n==='skills'?'volunteer':'issue'].map(function(c){return '<button type="button" class="chip" aria-pressed="false">'+c+'</button>'}).join('')+'</div>'}
+if(!T[view]){root.innerHTML='<h1>Zaria Village</h1><p>Please open this from the Zaria Village app, under the Estate tab.</p>';return}
+var h='<h1>'+T[view]+'</h1><form id="f" novalidate><div class="hp"><label>Leave empty<input type="text" name="bot-field" tabindex="-1" autocomplete="off"></label></div>';
+if(view==='idea')h+='<label>Your idea in a few words</label><input type="text" name="title" maxlength="120"><label>Tell us more</label><textarea name="details" maxlength="1500"></textarea><label>Your name (optional)</label><input type="text" name="name" maxlength="80"><label>Your plot or phone (so we can reply)</label><input type="text" name="contact" maxlength="60">';
+if(view==='volunteer')h+='<label>Your name</label><input type="text" name="name" maxlength="80"><label>Plot number</label><input type="text" name="plot" maxlength="20"><label>Phone</label><input type="tel" name="phone" maxlength="20"><label>How can you help? (tap all that apply)</label>'+chips('skills')+'<label>When are you free?</label><input type="text" name="availability" maxlength="120" placeholder="e.g. weekends, evenings"><label>Anything else</label><textarea name="notes" maxlength="800"></textarea>';
+if(view==='issue')h+='<label>What is it about?</label>'+chips('category',1)+'<label>Where? (plot or street)</label><input type="text" name="location" maxlength="120"><label>What is happening?</label><textarea name="description" maxlength="1500"></textarea><label>Photos (up to 3)</label><div class="photos">'+[1,2,3].map(function(i){return '<div class="ph"><span>&#128247;</span><input type="file" accept="image/*" data-p="'+i+'"></div>'}).join('')+'</div><label>Your plot or phone (so we can reply)</label><input type="text" name="contact" maxlength="60">';
+h+='<button class="go" type="submit">Send to the committee</button><div id="em"></div><p class="note">Goes to the committee only. It is not shown to other residents.</p></form>';
+root.innerHTML=h;
+var files={},f=document.getElementById('f'),em=document.getElementById('em'),btn=f.querySelector('.go');
+function say(t,c){em.className='msg '+c;em.textContent=t}
+[].forEach.call(f.querySelectorAll('.chips'),function(c){c.onclick=function(e){var b=e.target.closest('.chip');if(!b)return;if(c.dataset.one)[].forEach.call(c.children,function(x){if(x!==b)x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true')}});
+function shrink(file,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);c.toBlob(function(b){cb(b,c.toDataURL('image/jpeg',.6))},'image/jpeg',.72)};im.onerror=function(){cb(file,URL.createObjectURL(file))};im.src=r.result};r.readAsDataURL(file)}
+[].forEach.call(f.querySelectorAll('.ph input'),function(inp){inp.onchange=function(){var fl=inp.files[0],box=inp.parentNode;if(!fl)return;shrink(fl,function(blob,url){files[inp.dataset.p]=blob;var im=box.querySelector('img')||box.insertBefore(document.createElement('img'),inp);im.src=url})}});
+f.onsubmit=function(e){e.preventDefault();
+  if(f.querySelector('[name=bot-field]').value)return;
+  var fd=new FormData(f);
+  [].forEach.call(f.querySelectorAll('.chips'),function(c){fd.set(c.dataset.for,[].filter.call(c.children,function(b){return b.getAttribute('aria-pressed')==='true'}).map(function(b){return b.textContent}).join(', '))});
+  var main={idea:'title',volunteer:'name',issue:'description'}[view];
+  if(!String(fd.get(main)||'').trim()){say('Please fill in the main box first.','bad');return}
+  if(view==='issue'&&!String(fd.get('contact')||'').trim()){say('Please give your plot number or phone so we can reply.','bad');return}
+  fd.set('form-name',view);Object.keys(files).forEach(function(i){fd.set('photo'+i,files[i],'photo'+i+'.jpg')});
+  btn.disabled=true;say('Sending...','ok');
+  fetch('/',{method:'POST',body:fd}).then(function(r){if(!r.ok)throw new Error(r.status);
+    root.innerHTML='<div class="done"><h1>Thank you</h1><p>Your message has been sent to the committee.</p><p><a class="back" href="https://statement.zariavillage.co.ke/#estate">Back to Zaria Village</a></p></div>'})
+  .catch(function(){say('Could not send. Check your connection and try again.','bad');btn.disabled=false})};
+})();
+</script></body></html>
