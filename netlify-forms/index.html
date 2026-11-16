@@ -4,18 +4,18 @@
 <style>
 :root{--bg:#EEF3EC;--card:#fff;--fg:#1F2A24;--mute:#5F6F66;--green:#1E5631;--gold:#C9A227;--line:#C9D4CC;--inp:#FFF7C2;--ok:#E2EFDA;--okfg:#1E5631;--bad:#C00000;--badbg:#FFC7CE;--on:#fff}
 @media(prefers-color-scheme:dark){:root{--bg:#101712;--card:#18221B;--fg:#E6EEE8;--mute:#9DB0A3;--green:#8FD1A5;--gold:#D9B545;--line:#2F4036;--inp:#3A3716;--ok:#1F3A28;--okfg:#B7E6C4;--bad:#FF8A8A;--badbg:#4A2326;--on:#0F1A13}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:14px 16px 40px}
-.w{max-width:640px;margin:0 auto}.top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-a.back{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-weight:700;text-decoration:none;font-size:14px}
-h1{font-size:21px;margin:4px 0 6px;color:var(--green)}label{display:block;font-weight:700;font-size:14px;color:var(--green);margin:13px 0 4px}
-input[type=text],input[type=tel],input[type=email],textarea{width:100%;background:var(--inp);color:var(--fg);border:2px solid var(--gold);border-radius:8px;padding:10px;font:16px system-ui}textarea{min-height:100px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:18px;padding:8px 13px;font:600 14px system-ui;cursor:pointer;min-height:40px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:19px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:12px 12px 48px}
+.w{max-width:820px;margin:0 auto}.top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+a.back{display:inline-flex;align-items:center;min-height:50px;padding:0 18px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-weight:700;text-decoration:none;font-size:17px}
+h1{font-size:28px;margin:4px 0 6px;color:var(--green)}label{display:block;font-weight:700;font-size:18px;color:var(--green);margin:18px 0 6px}
+input[type=text],input[type=tel],input[type=email],textarea{width:100%;background:var(--inp);color:var(--fg);border:2px solid var(--gold);border-radius:8px;padding:14px;font:19px system-ui}textarea{min-height:150px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:18px;padding:11px 17px;font:600 17px system-ui;cursor:pointer;min-height:48px}
 .chip[aria-pressed=true]{background:var(--green);color:var(--on);border-color:var(--green)}
-.photos{display:flex;gap:8px}.ph{width:88px;height:88px;border-radius:10px;border:2px dashed var(--line);background:var(--card);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
+.photos{display:flex;gap:8px}.ph{width:104px;height:104px;border-radius:10px;border:2px dashed var(--line);background:var(--card);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.ph input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
-.go{display:block;width:100%;min-height:50px;margin-top:18px;border:0;border-radius:10px;background:var(--green);color:var(--on);font:700 17px system-ui;cursor:pointer}.go[disabled]{opacity:.55}
-.msg{margin-top:12px;padding:11px 12px;border-radius:8px;font-size:15px}.msg.ok{background:var(--ok);color:var(--okfg)}.msg.bad{background:var(--badbg);color:var(--bad)}
-.note{font-size:12.5px;color:var(--mute);margin-top:10px}.hp{position:absolute;left:-9999px;height:0;overflow:hidden}.done{text-align:center;padding:30px 10px}.done h1{font-size:24px}
+.go{display:block;width:100%;min-height:60px;margin-top:22px;border:0;border-radius:12px;background:var(--green);color:var(--on);font:700 20px system-ui;cursor:pointer}.go[disabled]{opacity:.55}
+.msg{margin-top:14px;padding:14px;border-radius:8px;font-size:18px}.msg.ok{background:var(--ok);color:var(--okfg)}.msg.bad{background:var(--badbg);color:var(--bad)}
+.note{font-size:16px;color:var(--mute);margin-top:10px}.hp{position:absolute;left:-9999px;height:0;overflow:hidden}.done{text-align:center;padding:30px 10px}.done h1{font-size:32px}
 </style></head><body><div class="w">
 <div class="top"><a class="back" id="bk" href="https://statement.zariavillage.co.ke/#estate">&#8249; Back to Zaria Village</a></div>
 <div id="root"></div></div>
