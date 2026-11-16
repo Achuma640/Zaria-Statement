@@ -266,10 +266,21 @@ $('theme').addEventListener('click',()=>{const r=document.documentElement;const 
       [].forEach.call(est.querySelectorAll('[data-v]'),function(b){b.onclick=function(){var v=b.dataset.v;if(FORMS_URL&&v!=='news'){location.href=FORMS_URL.replace(/\/+$/,'')+'/#'+v;return}view=v;draw();window.scrollTo(0,0)}});return}
     var back='<button class="back" id="eb">&#8249; Back</button>';
     if(view==='news'){var m=DATA.meetings||[],n=DATA.notices||[];
-      est.innerHTML=back+'<h2>Meetings and notices</h2>'+(m.length?m.map(function(x){var l=safe(x.link);return '<div class="card"><b>'+q(x.title)+'</b><small>'+q(x.when||'')+'</small><div style="margin-top:4px">'+q(x.where||'')+'</div>'+(x.note?'<div style="margin-top:4px;color:var(--mute);font-size:13px">'+q(x.note)+'</div>':'')+(l?'<div style="margin-top:6px"><a href="'+q(l)+'" target="_blank" rel="noopener">Open link</a></div>':'')+'</div>'}).join(''):'<div class="card">No meetings announced yet.</div>')+
+      est.innerHTML=back+'<h2>Meetings and notices</h2>'+(m.length?m.map(function(x,mi){var l=safe(x.link);return '<div class="card"><b>'+q(x.title)+'</b><small>'+q(x.when||'')+'</small><div style="margin-top:4px">'+q(x.where||'')+'</div>'+(x.note?'<div style="margin-top:4px;color:var(--mute);font-size:13px">'+q(x.note)+'</div>':'')+(l?'<div style="margin-top:6px"><a href="'+q(l)+'" target="_blank" rel="noopener" style="display:inline-block;background:var(--green);color:#fff;padding:9px 14px;border-radius:8px;text-decoration:none">Join the meeting</a></div>':'')+(x.start?'<div style="margin-top:8px"><button type="button" class="back" data-cal="'+mi+'" style="margin:0">Add to my calendar, with reminders</button><div class="note">Reminders: 1 day before, 30 minutes before and 15 minutes before.</div></div>':'')+'</div>'}).join(''):'<div class="card">No meetings announced yet.</div>')+
         '<h3>Notices and rules</h3>'+(n.length?n.map(function(x){var l=safe(x.link);return '<div class="card"><b>'+q(x.title)+'</b>'+(x.date?'<small>'+q(x.date)+'</small>':'')+'<div style="margin-top:4px">'+q(x.text||'')+'</div>'+(l?'<div style="margin-top:6px"><a href="'+q(l)+'" target="_blank" rel="noopener">Open</a></div>':'')+'</div>'}).join(''):'<div class="card">No notices at the moment.</div>');
+      [].forEach.call(est.querySelectorAll('[data-cal]'),function(b){b.onclick=function(){ics(DATA.meetings[+b.dataset.cal])}});
       document.getElementById('eb').onclick=function(){view='home';draw()};return}
     form(back)}
+  function ics(x){
+    var st=new Date(x.start),en=new Date(+st+(x.mins||90)*60000);
+    function z(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d+Z/,'Z')}
+    function e(t){return String(t||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n')}
+    var desc=(x.note||'')+(x.link?'\nJoin: '+x.link:''),L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zaria Village//Estate//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:zv-'+z(st)+'@zariavillage.co.ke','DTSTAMP:'+z(new Date()),'DTSTART:'+z(st),'DTEND:'+z(en),'SUMMARY:'+e(x.title),'LOCATION:'+e(x.link||x.where),'DESCRIPTION:'+e(desc)];
+    if(x.link)L.push('URL:'+x.link);
+    [['-P1D','Meeting tomorrow'],['-PT30M','Meeting in 30 minutes'],['-PT15M','Meeting in 15 minutes']].forEach(function(a){L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+e(a[1]+': '+x.title),'TRIGGER:'+a[0],'END:VALARM')});
+    L.push('END:VEVENT','END:VCALENDAR');
+    var blob=new Blob([L.join('\r\n')],{type:'text/calendar;charset=utf-8'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='zaria-village-meeting.ics';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500)}
   var CH={issue:['Road or drainage','Street light','Water','Security','Waste','Other'],volunteer:['Cleaning and greening','Security watch','Events','Technical or building','Accounts and admin','Other']};
   function form(back){
     var T={idea:'Share an idea',volunteer:'Volunteer',issue:'Report an issue'}[view],h=back+'<h2>'+T+'</h2><form id="ef" novalidate><div class="hp"><label>Leave this empty<input type="text" name="bot-field" tabindex="-1" autocomplete="off"></label></div>';

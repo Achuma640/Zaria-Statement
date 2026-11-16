@@ -1,7 +1,15 @@
 {
-  "meetings": [
-    {"title": "Residents and owners meeting", "when": "Thursday 19 November 2026, 7:30 pm", "where": "Online. The link is shared on the estate group.", "link": "", "note": "To discuss estate matters. Every resident and owner is welcome."}
-  ],
-  "notices": [],
-  "sponsors": []
+ "meetings": [
+  {
+   "title": "Residents and owners meeting",
+   "when": "Thursday 19 November 2026, 7:30 pm",
+   "where": "Online, on Microsoft Teams.",
+   "link": "https://teams.live.com/meet/9311926486207?p=bjOKZeB0tJqQv38EHG",
+   "note": "To discuss estate matters. Every resident and owner is welcome.",
+   "start": "2026-11-19T19:30:00+03:00",
+   "mins": 90
+  }
+ ],
+ "notices": [],
+ "sponsors": []
 }
