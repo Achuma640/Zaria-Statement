@@ -40,7 +40,7 @@ def _f(x):
 
 def units(U, sc):
     """Refresh coverage c (18 months May25-Oct26), credit cr and not-due nd from the Service Charge export
-    ('Service Charge'!A7:BU81). Names n, status s and notes t are kept. Returns the changed unit keys."""
+    ('Service Charge'!A7:BU82). Names n, status s and notes t are kept. Returns the changed unit keys."""
     changed = []
     for r in sc:
         r = r + [""] * (73 - len(r))
