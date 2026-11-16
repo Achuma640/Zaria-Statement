@@ -167,8 +167,8 @@ function plotHist(){if(!pq)return '';var U=BAL.map&&BAL.map[pq]&&BAL.units[BAL.m
  var all=DATA.filter(plotOk).slice().sort(function(a,b){return (a[0]+a[1]).localeCompare(b[0]+b[1])});
  if(!all.length)return '<h2 style="margin-top:14px">All payments, plot '+esc(pq)+'</h2><div class="card"><div class="empty">No receipts recorded for this plot.</div></div>';
  var am=U?monthsApplied(all,U):{by:{},approx:false},tot=all.reduce(function(a,r){return a+r[3]},0);
- var body=all.slice().reverse().map(function(r){var k=all.indexOf(r);return '<tr><td>'+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' '+r[0].slice(0,4)+'</td><td>'+t12(r[1])+'</td><td><button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button></td><td class="n">'+fmt(r[3])+'</td><td>'+esc(r[7])+'</td><td>'+esc(r[5])+'</td><td class="ma">'+esc(am.by[k]||'-')+'</td></tr>'}).join('');
- return '<h2 style="margin-top:16px">All payments, plot '+esc(pq)+' <span style="color:var(--mut);font-weight:400">all time &middot; '+all.length+' receipt'+(all.length>1?'s':'')+' &middot; KES '+fmt(tot)+'</span></h2><div class="card phs"><table class="ph"><thead><tr><th>Date</th><th>Time</th><th>M-Pesa ref</th><th>Amount</th><th>Type</th><th>Paid by</th><th>Month applied</th></tr></thead><tbody>'+body+'</tbody></table></div>'+(am.approx?'<p class="avg">* Approximate: the months on this plot come from the treasurer\'s record, which does not match the payments one for one, so the month shown may be a month out.</p>':'')+'<p class="avg">Month applied: service charge receipts are laid against the months the plot is shown as paid, oldest first. Other types show a dash. Shows all periods and types, whatever is chosen above.</p>'}
+ var body=all.slice().reverse().map(function(r){var k=all.indexOf(r);return '<tr><td>'+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' '+r[0].slice(0,4)+'</td><td>'+t12(r[1])+'</td><td><button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button></td><td class="n">'+fmt(r[3])+'</td><td class="ma">'+esc(am.by[k]||'-')+'</td><td>'+esc(r[7])+'</td><td>'+esc(r[5])+'</td></tr>'}).join('');
+ return '<h2 style="margin-top:16px">All payments, plot '+esc(pq)+' <span style="color:var(--mut);font-weight:400">all time &middot; '+all.length+' receipt'+(all.length>1?'s':'')+' &middot; KES '+fmt(tot)+'</span></h2><div class="card phs"><table class="ph"><thead><tr><th>Date</th><th>Time</th><th>M-Pesa ref</th><th>Amount</th><th>Month applied</th><th>Type</th><th>Paid by</th></tr></thead><tbody>'+body+'</tbody></table></div>'+(am.approx?'<p class="avg">* Approximate: the months on this plot come from the treasurer\'s record, which does not match the payments one for one, so the month shown may be a month out.</p>':'')+'<p class="avg">Month applied: service charge receipts are laid against the months the plot is shown as paid, oldest first. Other types show a dash. Shows all periods and types, whatever is chosen above.</p>'}
 function monthsApplied(all,U){var by={},S=[],i,j;
  for(i=0;i<18;i++)if(U.c[i])S.push(i);for(j=1;j<14;j++)if((U.ah[j]||0)>0)S.push(18+j);
  var amts=(U.ah||[]).filter(function(x){return x>0}),sc=all.filter(function(r){return r[7]==='Service charge / general'});
@@ -176,13 +176,15 @@ function monthsApplied(all,U){var by={},S=[],i,j;
  function cost(m){var a=m>=18?(U.ah||[])[m-18]:0;return a>0?a:rate}
  var cum=U.cr||0,need=0,done=0;
  sc.forEach(function(r){cum+=r[3];var got=[];while(done<S.length&&need+cost(S[done])<=cum+1e-6){need+=cost(S[done]);got.push(S[done]);done++}
-  by[all.indexOf(r)]=got.length?got.map(mlab2).join(', '):'Part payment or credit'});
+  by[all.indexOf(r)]=lbl2(got,r)});
  var approx=done!==S.length;
  if(approx&&done<S.length){var c2=0,n2=0,ix=S.length-1,i2,got2;for(i2=sc.length-1;i2>=0;i2--){c2+=sc[i2][3];got2=[];while(ix>=0&&n2+cost(S[ix])<=c2+1e-6){n2+=cost(S[ix]);got2.unshift(S[ix]);ix--}
-  by[all.indexOf(sc[i2])]=got2.length?got2.map(mlab2).join(', '):'Part payment or credit'}}
+  by[all.indexOf(sc[i2])]=lbl2(got2,sc[i2])}}
  if(approx)sc.forEach(function(r){var k=all.indexOf(r);by[k]+=' *'});
  all.forEach(function(r,k){if(r[7]!=='Service charge / general')by[k]='-'});
  return{by:by,approx:approx}}
+function lbl2(got,r){if(!got.length)return 'Part payment or credit';var ri=(+r[0].slice(0,4)-2025)*12+ +r[0].slice(5,7)-5,a=got.filter(function(k){return k<=ri}),f=got.filter(function(k){return k>ri});
+ return a.map(mlab2).join(', ')+(a.length&&f.length?'; ':'')+(f.length?'credit for '+f.map(mlab2).join(', '):'')}
 function mlab2(k){return MF[(k+4)%12].slice(0,3)+' '+(2025+Math.floor((k+4)/12))}
 function plotCard(){if(!pq)return '';var u=BAL.map&&BAL.map[pq];
  if(!u){var com=['1','106','148','156'].indexOf(pq)>-1;return '<div class="pcard"><h3>Plot '+esc(pq)+'</h3><p>'+(com?'Estate property (commercial centre, kindergarten, spa, recreation park). Not charged service charge.':'Plot not found in the register.')+'</p>'+lastRec()+'</div>'}
