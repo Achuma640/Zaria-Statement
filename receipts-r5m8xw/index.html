@@ -76,6 +76,7 @@ h2{font-size:16px;margin:2px 0 8px}
 .foot{color:var(--mut);font-size:11.5px;margin-top:14px}
 .srch{width:100%;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font:inherit;padding:0 12px;margin-bottom:10px}
 .ph{width:100%;border-collapse:collapse;font-size:12.5px}.ph th,.ph td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}.ph th{background:var(--hl);font-size:11px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}.ph td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}.ph td.ma{white-space:normal;min-width:120px;font-weight:600}.phs{overflow-x:auto}
+.sortl{display:flex;align-items:center;gap:8px;margin:8px 0;font-weight:700;font-size:14px}.sortl select{flex:1;padding:10px;border:2px solid #0B3D91;border-radius:10px;font:600 14px system-ui;background:#fff;color:#1B2A22}
 .card{border-width:2px!important;border-style:solid!important;border-color:#8fa396!important}#fb{background:#0B3D91!important;color:#fff!important;border:2px solid #0B3D91!important;font-weight:800!important}#fb.on{box-shadow:0 0 0 2px var(--gold)}.back{background:#c0392b!important;color:#fff!important;border:2px solid #c0392b!important;font-weight:800!important}</style></head><body><div class="wrap">
 <h1>Zaria Village Receipts Report</h1>
 <p class="sub" id="sub">Money received into the Zaria Village collection account (1136). Tap a type to see each receipt.</p>
@@ -218,6 +219,10 @@ function buildPicker(){var pk=document.getElementById('pk');pk.innerHTML='';
 function shift(dir){if(mode==='day'){var d=new Date(cur+'T12:00:00');d.setDate(d.getDate()+dir);var n=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(n>LASTD)return;cur=n}
  else{var L=periods(mode),i=L.indexOf(cur)+dir;if(i<0||i>=L.length)return;cur=L[i]}openCat=null;q='';draw()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var sk='new';
+function sortRows(a){return a.slice().sort(function(x,y){var tx=x[0]+x[1],ty=y[0]+y[1],nw=ty<tx?-1:ty>tx?1:0;if(sk==='hi')return y[3]-x[3]||nw;if(sk==='lo')return x[3]-y[3]||nw;if(sk==='old')return -nw;return nw})}
+function sortHtml(){return '<label class="sortl">Sort by <select id="dsort"><option value="new"'+(sk==='new'?' selected':'')+'>Latest first</option><option value="hi"'+(sk==='hi'?' selected':'')+'>Highest amount first</option><option value="lo"'+(sk==='lo'?' selected':'')+'>Lowest amount first</option><option value="old"'+(sk==='old'?' selected':'')+'>Oldest first</option></select></label>'}
+function wireSort(){var d=document.getElementById('dsort');if(d)d.onchange=function(){sk=this.value;draw()}}
 function rowHtml(r,showCat){return '<div class="row"><div class="l1"><span class="who">'+esc(r[5])+'</span><span class="amt">'+fmt(r[3])+'</span></div>'+
  '<div class="why">'+esc(r[6]||'No description')+'</div><div class="meta"><span>'+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' '+r[0].slice(0,4)+', '+r[1]+'</span>'+
  '<button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button><span>M-Pesa charge '+fmt(r[4])+'</span>'+(showCat?'<span>'+esc(r[7])+'</span>':'')+'</div></div>'}
@@ -293,23 +298,23 @@ function draw(){
  if(openCat!==null){
   var list=rows.filter(function(r){return openCat==='__all'||r[7]===openCat});
   if(q){var qq=q.toLowerCase();list=list.filter(function(r){return (r[5]+' '+r[6]+' '+r[2]).toLowerCase().indexOf(qq)>-1})}
-  var ct=list.reduce(function(a,r){return a+r[3]},0);
+  list=sortRows(list);var ct=list.reduce(function(a,r){return a+r[3]},0);
   v.innerHTML=plotCard()+'<button class="back" id="back">&#8249; All types</button><h2>'+esc(openCat==='__all'?'All receipts':openCat)+' <span style="color:var(--mut);font-weight:400">'+pLabel()+'</span></h2>'+
   '<div class="tiles"><div class="tile main"><small>Total</small><b>KES '+fmt(ct)+'</b></div><div class="tile"><small>Receipts</small><b>'+list.length+'</b></div><div class="tile"><small>M-Pesa Charges</small><b>'+fmt(list.reduce(function(a,r){return a+r[4]},0))+'</b></div></div>'+
-  '<p class="avg">'+(openCat==='__all'?avgLine(AV,ct,null):avgLine(AV,ct,openCat))+'</p>'+'<input class="srch" id="srch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">'+
+  '<p class="avg">'+(openCat==='__all'?avgLine(AV,ct,null):avgLine(AV,ct,openCat))+'</p>'+'<input class="srch" id="srch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">'+sortHtml()+
   '<div class="card">'+(list.length?list.map(function(r){return rowHtml(r,openCat==='__all')}).join(''):'<div class="empty">No receipts match.</div>')+'</div>'+plotHist();
   document.getElementById('back').onclick=function(){openCat=null;q='';draw()};
   var sr=document.getElementById('srch');sr.oninput=function(){q=sr.value;var p=sr.selectionStart;draw();var n=document.getElementById('srch');n.focus();n.setSelectionRange(p,p)};
-  wireRefs();return}
+  wireSort();wireRefs();return}
  var lr=rows;if(vw==='list'&&q){var qq0=q.toLowerCase();lr=rows.filter(function(r){return (r[5]+' '+r[6]+' '+r[2]).toLowerCase().indexOf(qq0)>-1})}
- var cats={};lr.forEach(function(r){var c=cats[r[7]]||(cats[r[7]]={n:r[7],a:0,c:0});c.a+=r[3];c.c++});
+ if(vw==='list')lr=sortRows(lr);var cats={};lr.forEach(function(r){var c=cats[r[7]]||(cats[r[7]]={n:r[7],a:0,c:0});c.a+=r[3];c.c++});
  var arr=Object.keys(cats).map(function(k){return cats[k]}).sort(function(a,b){return b.a-a.a}),mx=arr.length?arr[0].a:1;
  v.innerHTML=(pq?plotCard():balHtml())+'<div class="tiles"><div class="tile main"><small>'+(sc==='todate'?'Received to date':'Received'+(pq?' (plot '+pq+')':''))+'</small><b>KES '+fmt(tot)+'</b></div><div class="tile"><small>Receipts</small><b>'+rows.length+'</b></div><div class="tile"><small>Paybill charges</small><b>'+fmt(fee)+'</b></div></div>'+
- '<p class="avg">'+avgLine(AV,tot,null)+'</p>'+(vw==='list'?'<input class="srch" id="lsrch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">':'')+'<div class="card">'+(arr.length?arr.map(function(c){return '<button class="cat" data-c="'+esc(c.n)+'"><div class="t"><span class="n">'+esc(c.n)+'</span><span class="a">'+fmt(c.a)+'</span></div><div class="m">'+c.c+' receipt'+(c.c>1?'s':'')+' &middot; '+Math.round(c.a/tot*100)+'% of receipts</div><div class="m">'+avgLine(AV,c.a,c.n)+'</div><div class="bar"><i style="width:'+Math.max(2,Math.round(c.a/mx*100))+'%"></i></div></button><div class="nest">'+lr.filter(function(r){return r[7]===c.n}).map(function(r){return rowHtml(r,false)}).join('')+'</div>'}).join(''):'<div class="empty">No receipts in '+label(cur,mode)+'.</div>')+'</div>'+plotHist();
+ '<p class="avg">'+avgLine(AV,tot,null)+'</p>'+(vw==='list'?'<input class="srch" id="lsrch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">'+sortHtml():'')+'<div class="card">'+(arr.length?arr.map(function(c){return '<button class="cat" data-c="'+esc(c.n)+'"><div class="t"><span class="n">'+esc(c.n)+'</span><span class="a">'+fmt(c.a)+'</span></div><div class="m">'+c.c+' receipt'+(c.c>1?'s':'')+' &middot; '+Math.round(c.a/tot*100)+'% of receipts</div><div class="m">'+avgLine(AV,c.a,c.n)+'</div><div class="bar"><i style="width:'+Math.max(2,Math.round(c.a/mx*100))+'%"></i></div></button><div class="nest">'+lr.filter(function(r){return r[7]===c.n}).map(function(r){return rowHtml(r,false)}).join('')+'</div>'}).join(''):'<div class="empty">No receipts in '+label(cur,mode)+'.</div>')+'</div>'+plotHist();
  wireRefs();
  if(vw!=='list'){var cd=v.querySelector('.card');var tmp=document.createElement('div');tmp.innerHTML=vw==='graph'?graphHtml():vw==='map'?mapHtml():pieHtml(arr,tot);cd.outerHTML=tmp.innerHTML;if(vw==='map')loadNav(function(ok){var c=document.getElementById('rm');if(!c)return;if(ok){if(hasMap()){drawMap(c);var kk=document.getElementById('rmk');if(kk)kk.textContent='Green = paid for the current month, red = not paid. Neighbouring plots show R (residence) or B (building).'}else drawAll(c)}else{c.parentNode.innerHTML='<div class="empty">Map could not be loaded.</div>'}})}
  [].forEach.call(v.querySelectorAll('[data-c]'),function(b){b.onclick=function(){openCat=b.dataset.c;q='';draw();window.scrollTo(0,0)}});
- if(vw==='list'){wireRefs();var ls=document.getElementById('lsrch');if(ls)ls.oninput=function(){q=ls.value;var p=ls.selectionStart;draw();var n=document.getElementById('lsrch');n.focus();n.setSelectionRange(p,p)}}
+ if(vw==='list'){wireSort();wireRefs();var ls=document.getElementById('lsrch');if(ls)ls.oninput=function(){q=ls.value;var p=ls.selectionStart;draw();var n=document.getElementById('lsrch');n.focus();n.setSelectionRange(p,p)}}
  [].forEach.call(v.querySelectorAll('[data-k]'),function(b){b.onclick=function(){mode='month';cur=b.dataset.k;openCat='__all';q='';draw();window.scrollTo(0,0)}})}
 function wireRefs(){[].forEach.call(document.querySelectorAll('.ref'),function(b){b.onclick=function(){var t=b.dataset.ref,o=b.textContent;
  function ok(){b.textContent='Copied';setTimeout(function(){b.textContent=o},1200)}
