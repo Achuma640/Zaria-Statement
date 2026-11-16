@@ -76,7 +76,8 @@ button{font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--line)
 <p class="note">Up to June 2026 the months follow the treasurer's service-charge record. From July 2026 each payment covers the month received and any surplus carries forward (quarterly payers may also clear up to 2 months in arrears). "Paid*" means covered by an earlier payment. Red means not covered. AGM and road contributions are not counted as service charge.</p>
 <div id="nbox"><div class="bar"><span>Notes on your account</span></div><ul class="notes" id="notes"></ul></div>
 <div class="bar"><span>Payment history</span><span id="tot"></span></div>
-<div class="scroll"><table class="hist"><thead><tr><th>#</th><th>Date</th><th>Time</th><th>M-Pesa Ref</th><th>Amount</th><th>Reference (as paid)</th><th>Paid by</th><th>Type</th></tr></thead><tbody id="hb"></tbody></table></div>
+<div class="scroll"><table class="hist"><thead><tr><th>#</th><th>Date</th><th>Time</th><th>M-Pesa Ref</th><th>Amount</th><th>Reference (as paid)</th><th>Paid by</th><th>Type</th><th>Month applied</th></tr></thead><tbody id="hb"></tbody></table></div>
+<p class="note" id="hnote" hidden>* Approximate: the months on this plot come from the treasurer's record, which does not match the payments one for one, so the month shown may be a month out.</p>
 </div></div>
 <div class="foot">Statement generated from the Zaria Village paybill (1136) records, 10 Feb 2025 – 15 Nov 2026. Queries: contact the Treasurer or Asst. Treasurer - Kim / Andrew.</div>
 </div>
@@ -168,7 +169,30 @@ function show(raw){
   $('nbox').hidden=false;$('notes').innerHTML=ns.length?ns.map(n=>`<li><b>${n[1]}:</b> ${n[2]}</li>`).join(''):'<li>No notes on this account.</li>';
   const tot=mine.reduce((a,p)=>a+p[2],0);$('tot').textContent='Total: KES '+fmt(tot);
   const dd=d=>{const x=new Date(d+'T00:00:00');return String(x.getDate()).padStart(2,'0')+'-'+MN[x.getMonth()]+'-'+x.getFullYear();};
-  $('hb').innerHTML=mine.length?mine.map((p,i)=>`<tr><td>${i+1}</td><td>${dd(p[0])}</td><td>${p[8]||''}</td><td>${p[1]}</td><td class="n">${fmt(p[2])}</td><td>${esc(p[3])}</td><td>${esc(p[4])}</td><td>${p[7]}</td></tr>`).join(''):'<tr><td colspan="8">No payments found.</td></tr>';
+  const AM=monthsApplied(mine,V);
+  $('hnote').hidden=!AM.approx;
+  $('hb').innerHTML=mine.length?mine.map((p,i)=>`<tr><td>${i+1}</td><td>${dd(p[0])}</td><td>${p[8]||''}</td><td>${p[1]}</td><td class="n">${fmt(p[2])}</td><td>${esc(p[3])}</td><td>${esc(p[4])}</td><td>${p[7]}</td><td>${AM.by.get(p)||''}</td></tr>`).join(''):'<tr><td colspan="9">No payments found.</td></tr>';
+}
+// Which month each service-charge payment was applied to: payments are laid against the months this plot
+// is shown as covered, oldest first, each month taking its own amount (5,000 or 5,500).
+function monthsApplied(mine,V){
+  const by=new Map(),mlab=k=>MN[(k+4)%12]+' '+(2025+Math.floor((k+4)/12));
+  const S=[];for(let i=0;i<NC;i++)if(V.cov[i])S.push(i);for(let j=1;j<14;j++)if((V.ahead||[])[j]>0)S.push(18+j);
+  const amts=[].concat(V.disp||[],V.ahead||[]).filter(x=>x>0),rate=amts.some(x=>Math.abs(x-5500)<1)?5500:5000;
+  const cost=m=>{const a=m<18?(V.disp||[])[m]:(V.ahead||[])[m-18];return a>0?a:rate;};
+  let cum=V.credit||0,need=0,done=0;
+  const sc=mine.filter(p=>p[7]==='General').sort((a,b)=>(a[0]+(a[8]||'')).localeCompare(b[0]+(b[8]||'')));
+  sc.forEach(p=>{cum+=p[2];const got=[];while(done<S.length&&need+cost(S[done])<=cum+1e-6){need+=cost(S[done]);got.push(S[done]);done++;}
+    by.set(p,got.length?got.map(mlab).join(', '):'Part payment or credit');});
+  const approx=done!==S.length;
+  if(approx&&done<S.length){ // some covered months have no payment behind them (old record): line the latest payments up with the latest months
+    let c2=0,n2=0,ix=S.length-1;
+    for(let i=sc.length-1;i>=0;i--){c2+=sc[i][2];const got=[];while(ix>=0&&n2+cost(S[ix])<=c2+1e-6){n2+=cost(S[ix]);got.unshift(S[ix]);ix--;}
+      by.set(sc[i],got.length?got.map(mlab).join(', '):'Part payment or credit');}
+  }
+  if(approx)sc.forEach(p=>by.set(p,by.get(p)+' *'));
+  mine.forEach(p=>{if(p[7]!=='General')by.set(p,'-');});
+  return {by,approx};
 }
 function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 $('q').addEventListener('input',e=>show(e.target.value));

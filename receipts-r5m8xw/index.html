@@ -75,6 +75,7 @@ h2{font-size:16px;margin:2px 0 8px}
 .empty{padding:22px 14px;color:var(--mut);text-align:center}
 .foot{color:var(--mut);font-size:11.5px;margin-top:14px}
 .srch{width:100%;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font:inherit;padding:0 12px;margin-bottom:10px}
+.ph{width:100%;border-collapse:collapse;font-size:12.5px}.ph th,.ph td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}.ph th{background:var(--hl);font-size:11px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}.ph td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}.ph td.ma{white-space:normal;min-width:120px;font-weight:600}.phs{overflow-x:auto}
 .card{border-width:2px!important;border-style:solid!important;border-color:#8fa396!important}#fb{background:#0B3D91!important;color:#fff!important;border:2px solid #0B3D91!important;font-weight:800!important}#fb.on{box-shadow:0 0 0 2px var(--gold)}.back{background:#c0392b!important;color:#fff!important;border:2px solid #c0392b!important;font-weight:800!important}</style></head><body><div class="wrap">
 <h1>Zaria Village Receipts Report</h1>
 <p class="sub" id="sub">Money received into the Zaria Village collection account (1136). Tap a type to see each receipt.</p>
@@ -162,6 +163,27 @@ function unitOwe(U,ci){var miss=[],owe=0,k;for(k=U.nd||0;k<=ci;k++){var cv=k<18?
  return{miss:miss,owe:owe}}
 function lastRec(){var r=null;for(var i=0;i<DATA.length;i++){if(plotOk(DATA[i])){r=DATA[i];break}}
  return '<p style="margin:6px 0 2px;color:var(--fg)">Last receipt: '+(r?'<b>'+label(r[0],'day')+', '+t12(r[1])+'</b> &middot; KES '+fmt(r[3])+' &middot; '+esc(r[7])+' &middot; <span style="font-family:ui-monospace,Menlo,monospace">'+esc(r[2])+'</span>':'<b>none recorded</b>')+'</p>'}
+function plotHist(){if(!pq)return '';var U=BAL.map&&BAL.map[pq]&&BAL.units[BAL.map[pq]];
+ var all=DATA.filter(plotOk).slice().sort(function(a,b){return (a[0]+a[1]).localeCompare(b[0]+b[1])});
+ if(!all.length)return '<h2 style="margin-top:14px">All payments, plot '+esc(pq)+'</h2><div class="card"><div class="empty">No receipts recorded for this plot.</div></div>';
+ var am=U?monthsApplied(all,U):{by:{},approx:false},tot=all.reduce(function(a,r){return a+r[3]},0);
+ var body=all.slice().reverse().map(function(r){var k=all.indexOf(r);return '<tr><td>'+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' '+r[0].slice(0,4)+'</td><td>'+t12(r[1])+'</td><td><button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button></td><td class="n">'+fmt(r[3])+'</td><td>'+esc(r[7])+'</td><td>'+esc(r[5])+'</td><td class="ma">'+esc(am.by[k]||'-')+'</td></tr>'}).join('');
+ return '<h2 style="margin-top:16px">All payments, plot '+esc(pq)+' <span style="color:var(--mut);font-weight:400">all time &middot; '+all.length+' receipt'+(all.length>1?'s':'')+' &middot; KES '+fmt(tot)+'</span></h2><div class="card phs"><table class="ph"><thead><tr><th>Date</th><th>Time</th><th>M-Pesa ref</th><th>Amount</th><th>Type</th><th>Paid by</th><th>Month applied</th></tr></thead><tbody>'+body+'</tbody></table></div>'+(am.approx?'<p class="avg">* Approximate: the months on this plot come from the treasurer\'s record, which does not match the payments one for one, so the month shown may be a month out.</p>':'')+'<p class="avg">Month applied: service charge receipts are laid against the months the plot is shown as paid, oldest first. Other types show a dash. Shows all periods and types, whatever is chosen above.</p>'}
+function monthsApplied(all,U){var by={},S=[],i,j;
+ for(i=0;i<18;i++)if(U.c[i])S.push(i);for(j=1;j<14;j++)if((U.ah[j]||0)>0)S.push(18+j);
+ var amts=(U.ah||[]).filter(function(x){return x>0}),sc=all.filter(function(r){return r[7]==='Service charge / general'});
+ var rate=(amts.some(function(x){return Math.abs(x-5500)<1})||sc.some(function(r){return r[3]%5500===0&&r[3]%5000!==0}))?5500:5000;
+ function cost(m){var a=m>=18?(U.ah||[])[m-18]:0;return a>0?a:rate}
+ var cum=U.cr||0,need=0,done=0;
+ sc.forEach(function(r){cum+=r[3];var got=[];while(done<S.length&&need+cost(S[done])<=cum+1e-6){need+=cost(S[done]);got.push(S[done]);done++}
+  by[all.indexOf(r)]=got.length?got.map(mlab2).join(', '):'Part payment or credit'});
+ var approx=done!==S.length;
+ if(approx&&done<S.length){var c2=0,n2=0,ix=S.length-1,i2,got2;for(i2=sc.length-1;i2>=0;i2--){c2+=sc[i2][3];got2=[];while(ix>=0&&n2+cost(S[ix])<=c2+1e-6){n2+=cost(S[ix]);got2.unshift(S[ix]);ix--}
+  by[all.indexOf(sc[i2])]=got2.length?got2.map(mlab2).join(', '):'Part payment or credit'}}
+ if(approx)sc.forEach(function(r){var k=all.indexOf(r);by[k]+=' *'});
+ all.forEach(function(r,k){if(r[7]!=='Service charge / general')by[k]='-'});
+ return{by:by,approx:approx}}
+function mlab2(k){return MF[(k+4)%12].slice(0,3)+' '+(2025+Math.floor((k+4)/12))}
 function plotCard(){if(!pq)return '';var u=BAL.map&&BAL.map[pq];
  if(!u){var com=['1','106','148','156'].indexOf(pq)>-1;return '<div class="pcard"><h3>Plot '+esc(pq)+'</h3><p>'+(com?'Estate property (commercial centre, kindergarten, spa, recreation park). Not charged service charge.':'Plot not found in the register.')+'</p>'+lastRec()+'</div>'}
  var U=BAL.units[u],ci=curIdx(),R=unitOwe(U,ci),plots=Object.keys(BAL.map).filter(function(p){return BAL.map[p]===u&&p.indexOf('-')<0}).join(' & ');
@@ -273,7 +295,7 @@ function draw(){
   v.innerHTML=plotCard()+'<button class="back" id="back">&#8249; All types</button><h2>'+esc(openCat==='__all'?'All receipts':openCat)+' <span style="color:var(--mut);font-weight:400">'+pLabel()+'</span></h2>'+
   '<div class="tiles"><div class="tile main"><small>Total</small><b>KES '+fmt(ct)+'</b></div><div class="tile"><small>Receipts</small><b>'+list.length+'</b></div><div class="tile"><small>M-Pesa Charges</small><b>'+fmt(list.reduce(function(a,r){return a+r[4]},0))+'</b></div></div>'+
   '<p class="avg">'+(openCat==='__all'?avgLine(AV,ct,null):avgLine(AV,ct,openCat))+'</p>'+'<input class="srch" id="srch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">'+
-  '<div class="card">'+(list.length?list.map(function(r){return rowHtml(r,openCat==='__all')}).join(''):'<div class="empty">No receipts match.</div>')+'</div>';
+  '<div class="card">'+(list.length?list.map(function(r){return rowHtml(r,openCat==='__all')}).join(''):'<div class="empty">No receipts match.</div>')+'</div>'+plotHist();
   document.getElementById('back').onclick=function(){openCat=null;q='';draw()};
   var sr=document.getElementById('srch');sr.oninput=function(){q=sr.value;var p=sr.selectionStart;draw();var n=document.getElementById('srch');n.focus();n.setSelectionRange(p,p)};
   wireRefs();return}
@@ -281,7 +303,8 @@ function draw(){
  var cats={};lr.forEach(function(r){var c=cats[r[7]]||(cats[r[7]]={n:r[7],a:0,c:0});c.a+=r[3];c.c++});
  var arr=Object.keys(cats).map(function(k){return cats[k]}).sort(function(a,b){return b.a-a.a}),mx=arr.length?arr[0].a:1;
  v.innerHTML=(pq?plotCard():balHtml())+'<div class="tiles"><div class="tile main"><small>'+(sc==='todate'?'Received to date':'Received'+(pq?' (plot '+pq+')':''))+'</small><b>KES '+fmt(tot)+'</b></div><div class="tile"><small>Receipts</small><b>'+rows.length+'</b></div><div class="tile"><small>Paybill charges</small><b>'+fmt(fee)+'</b></div></div>'+
- '<p class="avg">'+avgLine(AV,tot,null)+'</p>'+(vw==='list'?'<input class="srch" id="lsrch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">':'')+'<div class="card">'+(arr.length?arr.map(function(c){return '<button class="cat" data-c="'+esc(c.n)+'"><div class="t"><span class="n">'+esc(c.n)+'</span><span class="a">'+fmt(c.a)+'</span></div><div class="m">'+c.c+' receipt'+(c.c>1?'s':'')+' &middot; '+Math.round(c.a/tot*100)+'% of receipts</div><div class="m">'+avgLine(AV,c.a,c.n)+'</div><div class="bar"><i style="width:'+Math.max(2,Math.round(c.a/mx*100))+'%"></i></div></button><div class="nest">'+lr.filter(function(r){return r[7]===c.n}).map(function(r){return rowHtml(r,false)}).join('')+'</div>'}).join(''):'<div class="empty">No receipts in '+label(cur,mode)+'.</div>')+'</div>';
+ '<p class="avg">'+avgLine(AV,tot,null)+'</p>'+(vw==='list'?'<input class="srch" id="lsrch" type="search" placeholder="Search payer, plot or M-Pesa ref" value="'+esc(q)+'">':'')+'<div class="card">'+(arr.length?arr.map(function(c){return '<button class="cat" data-c="'+esc(c.n)+'"><div class="t"><span class="n">'+esc(c.n)+'</span><span class="a">'+fmt(c.a)+'</span></div><div class="m">'+c.c+' receipt'+(c.c>1?'s':'')+' &middot; '+Math.round(c.a/tot*100)+'% of receipts</div><div class="m">'+avgLine(AV,c.a,c.n)+'</div><div class="bar"><i style="width:'+Math.max(2,Math.round(c.a/mx*100))+'%"></i></div></button><div class="nest">'+lr.filter(function(r){return r[7]===c.n}).map(function(r){return rowHtml(r,false)}).join('')+'</div>'}).join(''):'<div class="empty">No receipts in '+label(cur,mode)+'.</div>')+'</div>'+plotHist();
+ wireRefs();
  if(vw!=='list'){var cd=v.querySelector('.card');var tmp=document.createElement('div');tmp.innerHTML=vw==='graph'?graphHtml():vw==='map'?mapHtml():pieHtml(arr,tot);cd.outerHTML=tmp.innerHTML;if(vw==='map')loadNav(function(ok){var c=document.getElementById('rm');if(!c)return;if(ok){if(hasMap()){drawMap(c);var kk=document.getElementById('rmk');if(kk)kk.textContent='Green = paid for the current month, red = not paid. Neighbouring plots show R (residence) or B (building).'}else drawAll(c)}else{c.parentNode.innerHTML='<div class="empty">Map could not be loaded.</div>'}})}
  [].forEach.call(v.querySelectorAll('[data-c]'),function(b){b.onclick=function(){openCat=b.dataset.c;q='';draw();window.scrollTo(0,0)}});
  if(vw==='list'){wireRefs();var ls=document.getElementById('lsrch');if(ls)ls.oninput=function(){q=ls.value;var p=ls.selectionStart;draw();var n=document.getElementById('lsrch');n.focus();n.setSelectionRange(p,p)}}
