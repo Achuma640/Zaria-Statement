@@ -1,5 +1,6 @@
 <title>Zaria Village Statement</title>
 <meta charset="utf-8">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('zv-theme')||'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#14532D">
 <link rel="icon" href="icon-192.png">
@@ -241,7 +242,7 @@ function monthsApplied(mine,V){
 }
 function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 $('q').addEventListener('input',e=>show(e.target.value));
-$('theme').addEventListener('click',()=>{const r=document.documentElement;const d=r.getAttribute('data-theme')==='dark'||(!r.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches);r.setAttribute('data-theme',d?'light':'dark');});
+$('theme').addEventListener('click',()=>{const r=document.documentElement;const d=r.getAttribute('data-theme')==='dark'||(!r.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches);const n=d?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('zv-theme',n)}catch(e){}});
 </script>
 
 <script>
