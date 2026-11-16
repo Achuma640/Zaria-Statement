@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Zaria Village forms</title></head>
+<body>
+<p>This site only receives submissions from the Zaria Village statement app. Nothing to see here.</p>
+<!-- Netlify finds these forms when the site is deployed. Field names must match the app (see estate-forms in index.html). -->
+<form name="idea" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="name"><input name="contact"><input name="title"><textarea name="details"></textarea>
+</form>
+<form name="volunteer" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="name"><input name="plot"><input name="phone"><input name="skills"><input name="availability"><textarea name="notes"></textarea>
+</form>
+<form name="issue" method="POST" enctype="multipart/form-data" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="category"><input name="location"><textarea name="description"></textarea><input name="contact">
+  <input type="file" name="photo1"><input type="file" name="photo2"><input type="file" name="photo3">
+</form>
+</body></html>
