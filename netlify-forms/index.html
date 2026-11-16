@@ -8,7 +8,7 @@
 .w{max-width:640px;margin:0 auto}.top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 a.back{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font-weight:700;text-decoration:none;font-size:14px}
 h1{font-size:21px;margin:4px 0 6px;color:var(--green)}label{display:block;font-weight:700;font-size:14px;color:var(--green);margin:13px 0 4px}
-input[type=text],input[type=tel],textarea{width:100%;background:var(--inp);color:var(--fg);border:2px solid var(--gold);border-radius:8px;padding:10px;font:16px system-ui}textarea{min-height:100px}
+input[type=text],input[type=tel],input[type=email],textarea{width:100%;background:var(--inp);color:var(--fg);border:2px solid var(--gold);border-radius:8px;padding:10px;font:16px system-ui}textarea{min-height:100px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:18px;padding:8px 13px;font:600 14px system-ui;cursor:pointer;min-height:40px}
 .chip[aria-pressed=true]{background:var(--green);color:var(--on);border-color:var(--green)}
 .photos{display:flex;gap:8px}.ph{width:88px;height:88px;border-radius:10px;border:2px dashed var(--line);background:var(--card);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
@@ -22,13 +22,13 @@ input[type=text],input[type=tel],textarea{width:100%;background:var(--inp);color
 
 <!-- Forms Netlify detects when the site is deployed. Field names must match the page script below. -->
 <form name="idea" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="name"><input name="contact"><input name="title"><textarea name="details"></textarea>
+  <input name="bot-field"><input name="name"><input name="plot"><input name="phone"><input name="email"><input name="title"><textarea name="details"></textarea>
 </form>
 <form name="volunteer" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="name"><input name="plot"><input name="phone"><input name="skills"><input name="availability"><textarea name="notes"></textarea>
+  <input name="bot-field"><input name="name"><input name="plot"><input name="phone"><input name="email"><input name="skills"><input name="availability"><textarea name="notes"></textarea>
 </form>
 <form name="issue" method="POST" enctype="multipart/form-data" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field"><input name="category"><input name="location"><textarea name="description"></textarea><input name="contact">
+  <input name="bot-field"><input name="category"><input name="location"><textarea name="description"></textarea><input name="name"><input name="plot"><input name="phone"><input name="email">
   <input type="file" name="photo1"><input type="file" name="photo2"><input type="file" name="photo3">
 </form>
 
@@ -40,10 +40,11 @@ var CH={issue:['Road or drainage','Street light','Water','Security','Waste','Oth
 function chips(n,one){return '<div class="chips" data-for="'+n+'"'+(one?' data-one="1"':'')+'>'+CH[n==='skills'?'volunteer':'issue'].map(function(c){return '<button type="button" class="chip" aria-pressed="false">'+c+'</button>'}).join('')+'</div>'}
 window.addEventListener('hashchange',function(){location.reload()});
 if(!T[view]){root.innerHTML='<h1>Zaria Village</h1><p>What would you like to do?</p>'+Object.keys(T).map(function(k){return '<p><a class="back" style="width:100%;justify-content:center" href="#'+k+'">'+T[k]+'</a></p>'}).join('');return}
+var CT='<p class="note" style="margin:14px 0 0">So the committee can reply: give a phone or an email (plot number helps too).</p>'+'<label>Your name</label><input type="text" name="name" maxlength="80"><label>Plot number</label><input type="text" name="plot" maxlength="20"><label>Phone</label><input type="tel" name="phone" maxlength="20"><label>Email</label><input type="email" name="email" maxlength="120" autocomplete="email">';
 var h='<h1>'+T[view]+'</h1><form id="f" novalidate><div class="hp"><label>Leave empty<input type="text" name="bot-field" tabindex="-1" autocomplete="off"></label></div>';
-if(view==='idea')h+='<label>Your idea in a few words</label><input type="text" name="title" maxlength="120"><label>Tell us more</label><textarea name="details" maxlength="1500"></textarea><label>Your name (optional)</label><input type="text" name="name" maxlength="80"><label>Your plot or phone (so we can reply)</label><input type="text" name="contact" maxlength="60">';
-if(view==='volunteer')h+='<label>Your name</label><input type="text" name="name" maxlength="80"><label>Plot number</label><input type="text" name="plot" maxlength="20"><label>Phone</label><input type="tel" name="phone" maxlength="20"><label>How can you help? (tap all that apply)</label>'+chips('skills')+'<label>When are you free?</label><input type="text" name="availability" maxlength="120" placeholder="e.g. weekends, evenings"><label>Anything else</label><textarea name="notes" maxlength="800"></textarea>';
-if(view==='issue')h+='<label>What is it about?</label>'+chips('category',1)+'<label>Where? (plot or street)</label><input type="text" name="location" maxlength="120"><label>What is happening?</label><textarea name="description" maxlength="1500"></textarea><label>Photos (up to 3)</label><div class="photos">'+[1,2,3].map(function(i){return '<div class="ph"><span>&#128247;</span><input type="file" accept="image/*" data-p="'+i+'"></div>'}).join('')+'</div><label>Your plot or phone (so we can reply)</label><input type="text" name="contact" maxlength="60">';
+if(view==='idea')h+='<label>Your idea in a few words</label><input type="text" name="title" maxlength="120"><label>Tell us more</label><textarea name="details" maxlength="1500"></textarea>'+CT;
+if(view==='volunteer')h+=''+CT+'<label>How can you help? (tap all that apply)</label>'+chips('skills')+'<label>When are you free?</label><input type="text" name="availability" maxlength="120" placeholder="e.g. weekends, evenings"><label>Anything else</label><textarea name="notes" maxlength="800"></textarea>';
+if(view==='issue')h+='<label>What is it about?</label>'+chips('category',1)+'<label>Where? (plot or street)</label><input type="text" name="location" maxlength="120"><label>What is happening?</label><textarea name="description" maxlength="1500"></textarea><label>Photos (up to 3)</label><div class="photos">'+[1,2,3].map(function(i){return '<div class="ph"><span>&#128247;</span><input type="file" accept="image/*" data-p="'+i+'"></div>'}).join('')+'</div>'+CT;
 h+='<button class="go" type="submit">Send to the committee</button><div id="em"></div><p class="note">Goes to the committee only. It is not shown to other residents.</p></form>';
 root.innerHTML=h;
 var files={},f=document.getElementById('f'),em=document.getElementById('em'),btn=f.querySelector('.go');
@@ -57,7 +58,7 @@ f.onsubmit=function(e){e.preventDefault();
   [].forEach.call(f.querySelectorAll('.chips'),function(c){fd.set(c.dataset.for,[].filter.call(c.children,function(b){return b.getAttribute('aria-pressed')==='true'}).map(function(b){return b.textContent}).join(', '))});
   var main={idea:'title',volunteer:'name',issue:'description'}[view];
   if(!String(fd.get(main)||'').trim()){say('Please fill in the main box first.','bad');return}
-  if(view==='issue'&&!String(fd.get('contact')||'').trim()){say('Please give your plot number or phone so we can reply.','bad');return}
+  if(view!=='idea'&&!String(fd.get('phone')||'').trim()&&!String(fd.get('email')||'').trim()){say('Please give a phone number or an email so we can reply.','bad');return}
   fd.set('form-name',view);Object.keys(files).forEach(function(i){fd.set('photo'+i,files[i],'photo'+i+'.jpg')});
   btn.disabled=true;say('Sending...','ok');
   fetch('/',{method:'POST',body:fd}).then(function(r){if(!r.ok)throw new Error(r.status);
