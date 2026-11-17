@@ -321,6 +321,12 @@ async function openR(id,tag){rm.hidden=false;g('rmt').textContent=tag||'Receipt'
   if(d.mime==='application/pdf'){var u=URL.createObjectURL(b64blob(d.data,d.mime));b.innerHTML='<p>This receipt is a PDF.</p><a class="dl" href="'+u+'" target="_blank">Open the PDF</a>'}
   else b.innerHTML='<img alt="Receipt" src="data:'+d.mime+';base64,'+d.data+'">'}
  catch(e){b.innerHTML='<p style="color:#ff9d8a">Could not load the receipt: '+esc(e.message)+'</p>'}}
+/* keep the receipt icons live: fetch the saved-receipt list as soon as the report opens */
+var live=false,iv=setInterval(function(){if(g('app').hidden||!DATA.length)return;clearInterval(iv);var c=ls('zrc');if(!c||live)return;live=true;
+ api('?code='+encodeURIComponent(c)+'&receipts=1').then(function(d){if(!d||!d.ok||!d.receipts)return;
+  Object.keys(d.receipts).forEach(function(r){var have={};(RF[r]||[]).forEach(function(x){var m=/\/d\/([^\/?]+)/.exec(x[1]||'');if(m)have[m[1]]=1});
+   d.receipts[r].forEach(function(x){if(!have[x[1]])(RF[r]=RF[r]||[]).push([x[0],'https://drive.google.com/file/d/'+x[1]+'/view'])})});
+  try{draw()}catch(e){}}).catch(function(){})},300);
 document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.rcp');if(!a)return;e.preventDefault();openR(a.dataset.id,a.title)});
 })();
 </script>

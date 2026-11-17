@@ -18,6 +18,11 @@ function doGet(e){
   if (!codeOk_(p.code)) return out_({ok:false, error:'bad code'});
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var rf = ss.getSheetByName('Receipt Files').getDataRange().getValues();
+  if (p.receipts) {   // live list of saved receipts: {ref: [[tag, driveFileId], ...]}
+    var m = {};
+    for (var q = 1; q < rf.length; q++) if (rf[q][1] && rf[q][8]) (m[String(rf[q][1])] = m[String(rf[q][1])] || []).push([String(rf[q][2]), String(rf[q][8])]);
+    return out_({ok:true, receipts:m});
+  }
   if (p.file) {   // send one saved receipt back as base64 so the report can show it with no Google sign-in
     var okId = false;
     for (var k = 1; k < rf.length; k++) if (String(rf[k][8]) === String(p.file)) { okId = true; break; }
