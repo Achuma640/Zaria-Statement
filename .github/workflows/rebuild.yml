@@ -19,7 +19,7 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         with: { python-version: "3.12" }
       - if: steps.gate.outputs.run == 'true'
-        run: pip install cryptography google-auth requests pillow
+        run: pip install cryptography google-auth requests pillow numpy scipy
       - if: steps.gate.outputs.run == 'true'
         name: Fetch Sheet data
         env: { GOOGLE_SA_KEY: "${{ secrets.GOOGLE_SA_KEY }}" }
