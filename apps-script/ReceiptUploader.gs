@@ -17,8 +17,16 @@ function doGet(e){
   var p = (e && e.parameter) || {};
   if (!codeOk_(p.code)) return out_({ok:false, error:'bad code'});
   var ss = SpreadsheetApp.openById(SHEET_ID);
-  var tx = ss.getSheetByName('Transactions').getDataRange().getDisplayValues();
   var rf = ss.getSheetByName('Receipt Files').getDataRange().getValues();
+  if (p.file) {   // send one saved receipt back as base64 so the report can show it with no Google sign-in
+    var okId = false;
+    for (var k = 1; k < rf.length; k++) if (String(rf[k][8]) === String(p.file)) { okId = true; break; }
+    if (!okId) return out_({ok:false, error:'receipt not found'});
+    try { var bl = DriveApp.getFileById(p.file).getBlob();
+      return out_({ok:true, mime:bl.getContentType(), data:Utilities.base64Encode(bl.getBytes())});
+    } catch (er) { return out_({ok:false, error:'file missing from Drive'}); }
+  }
+  var tx = ss.getSheetByName('Transactions').getDataRange().getDisplayValues();
   var have = {};
   for (var i = 1; i < rf.length; i++) { var r = String(rf[i][1]); have[r] = (have[r]||0) + 1; }
   var pays = [];

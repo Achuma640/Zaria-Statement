@@ -72,11 +72,36 @@ h2{font-size:16px;margin:2px 0 8px}
 .foot{color:var(--mut);font-size:11.5px;margin-top:14px}
 .srch{width:100%;min-height:44px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;font:inherit;padding:0 12px;margin-bottom:10px}
 .sortl{display:flex;align-items:center;gap:8px;margin:8px 0;font-weight:700;font-size:14px}.sortl select{flex:1;padding:10px;border:2px solid #0B3D91;border-radius:10px;font:600 14px system-ui;background:#fff;color:#1B2A22}
-.card{border-width:2px!important;border-style:solid!important;border-color:#8fa396!important}#fb{background:#0B3D91!important;color:#fff!important;border:2px solid #0B3D91!important;font-weight:800!important}#fb.on{box-shadow:0 0 0 2px var(--gold)}.card:not(.x){border-color:#1f6b4a!important;border-width:3px!important}.back{background:#c0392b!important;color:#fff!important;border:2px solid #c0392b!important;font-weight:800!important}.rcp{color:#0b6b3a;font-weight:700;text-decoration:none;border:1px solid currentColor;border-radius:12px;padding:1px 9px}</style></head><body><div class="wrap">
+.card{border-width:2px!important;border-style:solid!important;border-color:#8fa396!important}#fb{background:#0B3D91!important;color:#fff!important;border:2px solid #0B3D91!important;font-weight:800!important}#fb.on{box-shadow:0 0 0 2px var(--gold)}.card:not(.x){border-color:#1f6b4a!important;border-width:3px!important}.back{background:#c0392b!important;color:#fff!important;border:2px solid #c0392b!important;font-weight:800!important}.rcp{color:#0b6b3a;font-weight:700;text-decoration:none;border:1px solid currentColor;border-radius:12px;padding:1px 9px}
+.ubtn{background:#b8860b;color:#fff;border:2px solid #b8860b;font:inherit;font-weight:800;min-height:46px;border-radius:10px;padding:0 14px;cursor:pointer;width:100%;margin:0 0 10px}
+.upn{background:var(--hl);border:2px solid var(--gold);border-radius:12px;padding:10px 12px 12px;margin:-2px 0 12px}
+.upn label{display:block;font-weight:700;margin:10px 0 4px;font-size:13px}
+.upn input,.upn select{width:100%;min-height:44px;border:1px solid var(--line);background:#fff;color:var(--fg);border-radius:8px;font:inherit;padding:0 10px}
+.upn select[size]{padding:4px}
+.upn .go{background:var(--green);color:#fff;border:0;font-weight:800;margin-top:12px;min-height:48px;border-radius:10px;width:100%;font:inherit;cursor:pointer}.upn .go:disabled{opacity:.5}
+.upn .m{margin:8px 0 0;font-weight:700}.upn .m.ok{color:#1e8449}.upn .m.er{color:#c0392b}
+#rm[hidden]{display:none}#rm{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:50;display:flex;flex-direction:column;padding:10px}
+#rm .bar2{display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:700;padding:4px 2px 8px}
+#rm .bar2 button{background:#fff;border:0;border-radius:8px;min-height:44px;padding:0 18px;font:inherit;font-weight:800}
+#rm .bd{flex:1;overflow:auto;text-align:center;color:#fff}
+#rm img{max-width:100%;height:auto;background:#fff;border-radius:6px}
+#rm input{min-height:44px;border-radius:8px;border:0;padding:0 12px;font:inherit;margin:8px 4px}
+#rm a.dl{display:inline-block;background:#fff;color:#17231b;padding:12px 18px;border-radius:8px;font-weight:800;text-decoration:none;margin:10px}
+</style></head><body><div class="wrap">
 <h1>Zaria Village Expenditure Report</h1>
 <p class="sub" id="sub">Payments out of the Zaria Village collection account (1136).</p>
 <div id="gate"><form id="gform" class="card" style="padding:16px"><h2 style="margin:0 0 6px">Treasurers only</h2><p class="sub" style="margin:0 0 10px">Enter the PIN to open the report.</p><input class="srch" id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN" aria-label="PIN"><label style="display:flex;gap:8px;align-items:center;margin-bottom:10px;color:var(--mut)"><input type="checkbox" id="rem" checked> Remember on this phone</label><button class="back" type="submit" style="margin:0;background:var(--green);color:#fff;border-color:var(--green)">Open report</button><p id="gmsg" class="sub" style="margin:8px 0 0" role="status"></p></form></div>
 <div id="app" hidden>
+<button class="ubtn" id="ub" aria-expanded="false">📎 Upload a receipt</button>
+<div class="upn" id="upn" hidden>
+<div id="ucw"><label for="ucode">Upload code</label><input id="ucode" type="password" autocomplete="off"></div>
+<label for="uq">Find the payment (payee, amount or ref)</label><input id="uq" placeholder="e.g. 4500 or Moses or UKF0">
+<label for="upay">Payment</label><select id="upay" size="6"></select>
+<label for="ufile">Receipt photo or PDF</label><input id="ufile" type="file" accept="image/*,application/pdf" multiple>
+<label for="utag">Tag</label><select id="utag"></select>
+<label for="unote">Note (optional)</label><input id="unote" placeholder="what it was for">
+<label for="uby">Your name</label><input id="uby" placeholder="treasurer name">
+<button class="go" id="ugo">Upload</button><div class="m" id="umsg"></div></div>
 <div class="seg" id="seg" role="group" aria-label="Period type">
 <button data-m="day">Day</button><button data-m="month">Month</button><button data-m="quarter">Quarter</button><button data-m="year">Year</button><button data-m="all">All time</button></div>
 <div class="picker"><button id="prev" aria-label="Previous period">&#8249;</button><span id="pk" style="flex:1;display:flex;min-width:0"></span><button id="next" aria-label="Next period">&#8250;</button><span class="vt" id="vt" role="group" aria-label="Show as"><button data-v="list" aria-label="List" title="List"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></button><button data-v="graph" aria-label="Graph" title="Graph"><svg viewBox="0 0 24 24"><path d="M4 20V4h2v14h14v2zm4-4v-5h3v5zm5 0V7h3v9zm5 0v-3h3v3z"/></svg></button><button data-v="pie" aria-label="Pie chart" title="Pie chart"><svg viewBox="0 0 24 24"><path d="M11 3a9 9 0 1 0 9 9h-9zm2 0v8h8a8 8 0 0 0-8-8z"/></svg></button></span></div>
@@ -137,7 +162,7 @@ var sk='new';
 function sortRows(a){return a.slice().sort(function(x,y){var tx=x[0]+x[1],ty=y[0]+y[1],nw=ty<tx?-1:ty>tx?1:0;if(sk==='hi')return y[3]-x[3]||nw;if(sk==='lo')return x[3]-y[3]||nw;if(sk==='old')return -nw;return nw})}
 function sortHtml(){return '<label class="sortl">Sort by <select id="dsort"><option value="new"'+(sk==='new'?' selected':'')+'>Latest first</option><option value="hi"'+(sk==='hi'?' selected':'')+'>Highest amount first</option><option value="lo"'+(sk==='lo'?' selected':'')+'>Lowest amount first</option><option value="old"'+(sk==='old'?' selected':'')+'>Oldest first</option></select></label>'}
 function wireSort(){var d=document.getElementById('dsort');if(d)d.onchange=function(){sk=this.value;draw()}}
-function rcpHtml(ref){var a=RF[ref];if(!a||!a.length)return'';return a.map(function(x,i){return'<a class="rcp" href="'+esc(x[1])+'" target="_blank" rel="noopener" title="'+esc(x[0])+'">\uD83D\uDCCE Receipt'+(a.length>1?' '+(i+1):'')+'</a>'}).join('')}
+function rcpHtml(ref){var a=RF[ref];if(!a||!a.length)return'';return a.map(function(x,i){var m=/\/d\/([^\/?]+)/.exec(x[1]||''),id=m?m[1]:'';return'<a class="rcp" href="#" data-id="'+esc(id)+'" title="'+esc(x[0])+'">📎 Receipt'+(a.length>1?' '+(i+1):'')+'</a>'}).join('')}
 function rowHtml(r,showCat){return '<div class="row"><div class="l1"><span class="who">'+esc(r[5])+'</span><span class="amt">'+fmt(r[3])+'</span></div>'+
  '<div class="why">'+esc(r[6]||'No description')+'</div><div class="meta"><span>'+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' '+r[0].slice(0,4)+', '+r[1]+'</span>'+
  '<button class="ref" data-ref="'+esc(r[2])+'" title="Tap to copy">'+esc(r[2])+'</button><span>M-Pesa charge '+fmt(r[4])+'</span>'+rcpHtml(r[2])+(showCat?'<span>'+esc(r[7])+'</span>':'')+'</div></div>'}
@@ -248,4 +273,53 @@ function tryPin(pin,remember,auto){var msg=document.getElementById('gmsg');msg.t
  return unlock(pin,remember).catch(function(){if(auto){try{localStorage.removeItem('zv_tr_pin')}catch(e){}}else msg.textContent='Wrong PIN. Try again.'})}
 document.getElementById('gform').onsubmit=function(e){e.preventDefault();var v=document.getElementById('pin').value.trim();if(v)tryPin(v,document.getElementById('rem').checked,false)};
 (function(){var p=null;try{p=localStorage.getItem('zv_tr_pin')}catch(e){}if(p)tryPin(p,true,true)})();
-</script></body></html>
+</script><script>
+(function(){
+var SU='https://script.google.com/macros/s/AKfycbzl3Qyfyd0sTG61ahJgNk-auAMnbZFIX9LKnKBjfr7wDB38tGMvukp6vdnlLiT1cHY3Nw/exec';
+var TG=['Bush clearing & grounds','Pool & club house','Security & guard houses','Caretaker & salaries','Legal, registration & admin','Utilities & repairs','Road construction & works','AGM & events','Refund / transfer to resident','Other'];
+var g=function(i){return document.getElementById(i)};
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function api(q,body){return fetch(SU+(q||''),body?{method:'POST',body:body,headers:{'Content-Type':'text/plain;charset=utf-8'}}:{}).then(function(r){return r.json()})}
+function um(t,c){g('umsg').className='m '+(c||'');g('umsg').textContent=t}
+function pays(){return DATA.slice().sort(function(x,y){var a=x[0]+x[1],b=y[0]+y[1];return a<b?1:a>b?-1:0})}
+function drawP(){var q=g('uq').value.toLowerCase().trim(),h='';
+ pays().filter(function(r){return!q||(r[2]+r[5]+r[6]+r[3]+r[7]).toLowerCase().indexOf(q)>-1}).slice(0,60).forEach(function(r){
+  h+='<option value="'+esc(r[2])+'">'+(RF[r[2]]?'\u2713 ':'')+r[0].slice(8)+' '+MN[+r[0].slice(5,7)-1]+' \u00b7 KES '+fmt(r[3])+' \u00b7 '+esc(r[5])+'</option>'});
+ g('upay').innerHTML=h;pick()}
+function pick(){var r=DATA.filter(function(x){return x[2]===g('upay').value})[0];if(!r)return;
+ var o=g('utag').options,c=r[7].toLowerCase().replace(/&/g,'and');for(var i=0;i<o.length;i++)if(o[i].text.toLowerCase().replace(/&/g,'and')===c){g('utag').selectedIndex=i;break}}
+g('utag').innerHTML=TG.map(function(t){return'<option>'+esc(t)+'</option>'}).join('');
+g('ub').onclick=function(){var p=g('upn'),o=p.hidden;p.hidden=!o;this.setAttribute('aria-expanded',o);
+ if(o){var c=ls('zrc');if(c){g('ucode').value=c;g('ucw').hidden=true}g('uby').value=ls('zrb')||'';drawP()}};
+g('uq').oninput=drawP;g('upay').onchange=pick;
+function shrink(f){return new Promise(function(res,rej){
+ if(f.type==='application/pdf'){var r=new FileReader();r.onload=function(){res({mime:f.type,data:r.result.split(',')[1]})};r.onerror=rej;r.readAsDataURL(f);return}
+ var im=new Image(),u=URL.createObjectURL(f);im.onload=function(){var s=Math.min(1,1700/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res({mime:'image/jpeg',data:c.toDataURL('image/jpeg',.8).split(',')[1]})};im.onerror=rej;im.src=u})}
+g('ugo').onclick=async function(){
+ var ref=g('upay').value,fs=g('ufile').files,code=g('ucode').value;
+ if(!code)return um('Enter the upload code.','er');if(!ref)return um('Pick the payment first.','er');if(!fs.length)return um('Choose a receipt photo or PDF.','er');
+ ls('zrb',g('uby').value);g('ugo').disabled=true;var done=0;
+ try{for(var i=0;i<fs.length;i++){um('Uploading '+(i+1)+' of '+fs.length+'...');var f=await shrink(fs[i]);
+   var d=await api('',JSON.stringify({code:code,ref:ref,tag:g('utag').value,note:g('unote').value,by:g('uby').value,mime:f.mime,data:f.data}));
+   if(!d.ok)throw new Error(d.error==='bad code'?'that upload code was not accepted':d.error);
+   ls('zrc',code);(RF[ref]=RF[ref]||[]).push([g('utag').value,d.link]);done++}
+  um('Saved '+done+' receipt'+(done>1?'s':'')+'. It now shows on the payment.','ok');g('ufile').value='';g('unote').value='';g('ucw').hidden=true;drawP();draw()}
+ catch(e){um('Not saved: '+e.message+(done?' ('+done+' saved first)':''),'er')}
+ g('ugo').disabled=false};
+/* in-page receipt viewer: no Google sign-in needed */
+var rm=document.createElement('div');rm.id='rm';rm.hidden=true;rm.innerHTML='<div class="bar2"><span id="rmt">Receipt</span><button id="rmx">Close</button></div><div class="bd" id="rmb"></div>';document.body.appendChild(rm);
+g('rmx').onclick=function(){rm.hidden=true;g('rmb').innerHTML=''};
+function b64blob(d,m){var s=atob(d),a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return new Blob([a],{type:m})}
+async function openR(id,tag){rm.hidden=false;g('rmt').textContent=tag||'Receipt';var b=g('rmb'),code=ls('zrc');
+ if(!code){b.innerHTML='<p>Enter the upload code to view receipts.</p><input id="rmc" type="password" autocomplete="off"><br><button class="ubtn" style="width:auto;padding:0 24px" id="rmg">View</button><p id="rme" style="color:#ff9d8a"></p>';
+  g('rmg').onclick=function(){var v=g('rmc').value;if(v){ls('zrc',v);openR(id,tag)}};return}
+ b.innerHTML='<p>Loading receipt...</p>';
+ try{var d=await api('?code='+encodeURIComponent(code)+'&file='+encodeURIComponent(id));
+  if(!d.ok){if(d.error==='bad code'){try{localStorage.removeItem('zrc')}catch(e){}b.innerHTML='<p style="color:#ff9d8a">That code was not accepted.</p>';setTimeout(function(){openR(id,tag)},1200);return}throw new Error(d.error)}
+  if(d.mime==='application/pdf'){var u=URL.createObjectURL(b64blob(d.data,d.mime));b.innerHTML='<p>This receipt is a PDF.</p><a class="dl" href="'+u+'" target="_blank">Open the PDF</a>'}
+  else b.innerHTML='<img alt="Receipt" src="data:'+d.mime+';base64,'+d.data+'">'}
+ catch(e){b.innerHTML='<p style="color:#ff9d8a">Could not load the receipt: '+esc(e.message)+'</p>'}}
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.rcp');if(!a)return;e.preventDefault();openR(a.dataset.id,a.title)});
+})();
+</script>
+</body></html>
