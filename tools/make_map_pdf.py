@@ -30,6 +30,31 @@ def classify():
 
 def font(sz): return ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", sz)
 
+import numpy as np
+from scipy.ndimage import distance_transform_edt
+
+def label_spot(poly):
+    """Point deepest inside the plot (pole of inaccessibility) and its depth in px. The plain
+    average of the vertices is pulled sideways by repeated points, which misplaced small plots."""
+    pts = [tuple(q) for q in poly]
+    xs, ys = [q[0] for q in pts], [q[1] for q in pts]
+    x0, y0 = int(min(xs)) - 2, int(min(ys)) - 2
+    w, h = int(max(xs)) - x0 + 3, int(max(ys)) - y0 + 3
+    m = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(m).polygon([(x - x0, y - y0) for x, y in pts], fill=1)
+    dist = distance_transform_edt(np.array(m))
+    iy, ix = np.unravel_index(np.argmax(dist), dist.shape)
+    return ix + x0, iy + y0, float(dist[iy, ix])
+
+def draw_label(d, poly, text, letter, fg):
+    cx, cy, depth = label_spot(poly)
+    size = int(max(12, min(25, 2 * depth * 0.85 / (0.68 * len(text)))))
+    if letter:
+        d.text((cx, cy - size * 0.45), text, font=font(size), fill=fg, anchor="mm", stroke_width=0)
+        d.text((cx, cy + size * 0.55), letter, font=font(max(12, int(size * 0.84))), fill=fg, anchor="mm")
+    else:
+        d.text((cx, cy), text, font=font(size), fill=fg, anchor="mm")
+
 def main(outdir):
     cls, counts = classify()
     last = dt.datetime.strptime(max(p[0] for p in D["P"]), "%Y-%m-%d")
@@ -38,11 +63,8 @@ def main(outdir):
         d.polygon([tuple(q) for q in POLY[p]], fill=COL[c] + (235,), outline=(60, 30, 25, 255), width=2)
     img = Image.alpha_composite(base.convert("RGBA"), over); d = ImageDraw.Draw(img)
     for p, (c, letter) in cls.items():
-        xs, ys = [q[0] for q in POLY[p]], [q[1] for q in POLY[p]]
-        cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
         fg = (0, 0, 0) if c == "yellow" else (255, 255, 255)
-        d.text((cx, cy - (11 if letter else 0)), p, font=font(25), fill=fg, anchor="mm")
-        if letter: d.text((cx, cy + 13), letter, font=font(21), fill=fg, anchor="mm")
+        draw_label(d, POLY[p], p, letter, fg)
     # hide the "CO-ORDINATES" note and draw the legend there
     d.rectangle([1240, 2185, 2255, 2515], outline=(0, 0, 0), width=3, fill=(255, 255, 255, 255))
     lab = [("never", "Living or building, never paid: %d plots"), ("red", "5 or more months unpaid: %d plots"),
