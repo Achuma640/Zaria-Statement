@@ -80,6 +80,7 @@ h2{font-size:16px;margin:2px 0 8px}
 .upn select[size]{padding:4px}
 .upn .go{background:var(--green);color:#fff;border:0;font-weight:800;margin-top:12px;min-height:48px;border-radius:10px;width:100%;font:inherit;cursor:pointer}.upn .go:disabled{opacity:.5}
 .upn .m{margin:8px 0 0;font-weight:700}.upn .m.ok{color:#1e8449}.upn .m.er{color:#c0392b}
+.vall{background:#1f6b4a!important;color:#fff!important;border:3px solid #b8860b!important;border-radius:10px!important;min-height:50px;font-weight:800!important;font-size:16px}.vall .a{color:#fff!important}button.vall{display:block;width:100%;margin:0 0 10px}.card .vall{border-radius:0!important;margin:0;width:100%}
 #ucl.req{color:#c0392b}#ucode.req{border:2px solid #c0392b;background:#fdecea}#rm[hidden]{display:none}#rm{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:50;display:flex;flex-direction:column;padding:10px}
 #rm .bar2{display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:700;padding:4px 2px 8px}
 #rm .bar2 button{background:#fff;border:0;border-radius:8px;min-height:44px;padding:0 18px;font:inherit;font-weight:800}
@@ -201,7 +202,7 @@ function graphHtml(){
  if(pr.length){var ay=T+ph-ph*avg/top;o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+ay+'" y2="'+ay+'" stroke="#d9480f" stroke-width="2" stroke-dasharray="5 3"/><text x="'+(L+2)+'" y="'+(ay-3)+'" style="fill:#d9480f;font-weight:700;font-size:9.5px">'+pr.length+'-mo avg '+k2(avg)+'</text>'}
  o+='</svg>';
  return '<div class="card chart">'+o+'<div class="key">'+(cum?'Running total of spend (balance as at the end of each month), last 12 months to '+label(nm(e),'month')+'. Tap a month to see its payments.':'Month by month, last 12 months to '+label(nm(e),'month')+'. Dashed line = average of the '+(pr.length||0)+' months before it. Tap a month to see its payments.')+'</div></div>'+
-  '<div class="card"><button class="cat" data-c="__all"><div class="t"><span class="n">View all payments</span><span class="a">&#8250;</span></div></button></div>'}
+  '<div class="card"><button class="cat vall" data-c="__all"><div class="t"><span class="n">View all payments</span><span class="a">&#8250;</span></div></button></div>'}
 function wrapTxt(t,n){var w=t.split(' '),ln=[],c='';w.forEach(function(x){if((c+' '+x).trim().length>n&&c){ln.push(c);c=x}else c=(c+' '+x).trim()});if(c)ln.push(c);return ln}
 function pieHtml(arr,tot){
  if(!arr.length)return '<div class="card"><div class="empty">No payments in this period.</div></div>';
@@ -222,7 +223,7 @@ function pieHtml(arr,tot){
    ins+='<g class="bk" data-c="'+esc(x.c.n)+'" style="cursor:pointer"><polyline points="'+ex+','+ey+' '+(cx+side*(r+16))+','+ly+' '+(lx-side*3)+','+ly+'" fill="none" stroke="'+x.col+'" stroke-width="1.5"/><text text-anchor="'+(side>0?'start':'end')+'" style="fill:var(--fg);font-size:9.5px;font-weight:600">'+ln.map(function(t,k){return '<tspan x="'+lx+'" y="'+(ly-(ln.length-1)*5.5+3+k*11)+'">'+esc(t)+'</tspan>'}).join('')+'</text></g>'})});
  o+=ins+'</svg>';
  return '<div class="card chart">'+o+'<div class="key">Tap a slice to see its payments. Total KES '+fmt(tot)+'.</div></div>'+
-  '<div class="card"><button class="cat" data-c="__all"><div class="t"><span class="n">View all payments</span><span class="a">&#8250;</span></div></button></div>'}
+  '<div class="card"><button class="cat vall" data-c="__all"><div class="t"><span class="n">View all payments</span><span class="a">&#8250;</span></div></button></div>'}
 function draw(){
  [].forEach.call(document.querySelectorAll('#seg button'),function(b){b.setAttribute('aria-pressed',b.dataset.m===mode)});
  [].forEach.call(document.querySelectorAll('#sc button'),function(b){b.setAttribute('aria-pressed',b.dataset.s===sc)});
@@ -248,7 +249,7 @@ function draw(){
  var cats={};rows.forEach(function(r){var c=cats[r[7]]||(cats[r[7]]={n:r[7],a:0,c:0});c.a+=r[3];c.c++});
  var arr=Object.keys(cats).map(function(k){return cats[k]}).sort(function(a,b){return b.a-a.a}),mx=arr.length?arr[0].a:1;
  v.innerHTML=balHtml()+'<div class="tiles"><div class="tile main"><small>'+(sc==='todate'?'Spent to date':'Spent')+'</small><b>KES '+fmt(tot)+'</b></div><div class="tile"><small>Payments</small><b>'+rows.length+'</b></div><div class="tile"><small>M-Pesa charges</small><b>'+fmt(fee)+'</b></div></div>'+
- '<p class="avg">'+avgLine(AV,tot,null)+'</p><div class="card">'+(arr.length?arr.map(function(c){return '<button class="cat" data-c="'+esc(c.n)+'"><div class="t"><span class="n">'+esc(c.n)+'</span><span class="a">'+fmt(c.a)+'</span></div><div class="m">'+c.c+' payment'+(c.c>1?'s':'')+' &middot; '+Math.round(c.a/tot*100)+'% of spend</div><div class="m">'+avgLine(AV,c.a,c.n)+'</div><div class="bar"><i style="width:'+Math.max(2,Math.round(c.a/mx*100))+'%"></i></div></button>'}).join('')+'<button class="cat" data-c="__all"><div class="t"><span class="n">View all payments</span><span class="a">&#8250;</span></div></button>':'<div class="empty">No payments in '+label(cur,mode)+'.</div>')+'</div>';
+ '<p class="avg">'+avgLine(AV,tot,null)+'</p>'+(arr.length?'<button class="cat vall" data-c="__all"><div class="t"><span class="n">View all payments</span><span class="a">&#8250;</span></div></button>':'')+'<div class="card">'+(arr.length?arr.map(function(c){return '<button class="cat" data-c="'+esc(c.n)+'"><div class="t"><span class="n">'+esc(c.n)+'</span><span class="a">'+fmt(c.a)+'</span></div><div class="m">'+c.c+' payment'+(c.c>1?'s':'')+' &middot; '+Math.round(c.a/tot*100)+'% of spend</div><div class="m">'+avgLine(AV,c.a,c.n)+'</div><div class="bar"><i style="width:'+Math.max(2,Math.round(c.a/mx*100))+'%"></i></div></button>'}).join(''):'<div class="empty">No payments in '+label(cur,mode)+'.</div>')+'</div>';
  if(vw!=='list'){var cd=v.querySelector('.card');var tmp=document.createElement('div');tmp.innerHTML=vw==='graph'?graphHtml():pieHtml(arr,tot);cd.outerHTML=tmp.innerHTML}
  [].forEach.call(v.querySelectorAll('[data-c]'),function(b){b.onclick=function(){openCat=b.dataset.c;q='';draw();window.scrollTo(0,0)}});
  [].forEach.call(v.querySelectorAll('[data-k]'),function(b){b.onclick=function(){mode='month';cur=b.dataset.k;openCat='__all';q='';draw();window.scrollTo(0,0)}})}
