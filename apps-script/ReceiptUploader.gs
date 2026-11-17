@@ -4,7 +4,7 @@
  * Setup: see apps-script/README.md. Set Script properties: UPLOAD_CODE (shared code for treasurers).
  */
 var SHEET_ID  = '1E9q6ot6hEpbIsJujR72FJ24i1eZcH5SWNAk930pMRfY';
-var FOLDER_ID = '1PcYlUtcZ5xIBMjjH0jGUfC8oEoTeUh_o';   // Drive folder "Zaria Village Receipts"
+var FOLDER_ID = '1i4PLoXfTX_S-Dsp-kzpbd0-m1KqLIHKL';   // Drive folder "Zaria Village Receipts"
 var TAGS = ['Bush clearing & grounds','Pool & club house','Security & guard houses','Caretaker & salaries',
             'Legal, registration & admin','Utilities & repairs','Road construction & works','AGM & events',
             'Refund / transfer to resident','Other'];
