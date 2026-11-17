@@ -18,7 +18,7 @@ from datetime import datetime
 MONTHS = ["May 25","Jun 25","Jul 25","Aug 25","Sep 25","Oct 25","Nov 25","Dec 25","Jan 26",
           "Feb 26","Mar 26","Apr 26","May 26","Jun 26","Jul 26","Aug 26","Sep 26","Oct 26","Nov 26"]
 FLAG0, RCVD0 = 50, 30          # 0-based column index of AY (May 25 flag) and AE (May 25 received)
-NOT_CHARGED = {"106", "148", "156"}   # plots that are never charged service charge
+NOT_CHARGED = {"106", "148", "156", "194"}   # estate plots never charged service charge (194 = borehole)
 COL_BT, COL_BU = 71, 72        # 0-based index of BT (first month due) and BU (carry)
 
 

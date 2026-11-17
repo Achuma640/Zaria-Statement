@@ -39,6 +39,8 @@ assert [x for x in w if x["range"].startswith("'Service Charge'!B")][0]["values"
 # 6. already-applied receipts are ignored; non-charged plots are marked
 r = tx("A7", 5000, "106"); w, a = plan([r], [sc_row("13", "Resident", [True] * 19)])
 assert w[0]["values"] == [["not charged"]]
+r = tx("A7b", 5000, "194"); w, a = plan([r], [sc_row("13", "Resident", [True] * 19)])
+assert w[0]["values"] == [["not charged"]]
 r = tx("A8", 5000, "13"); r[17] = "legacy"; w, a = plan([r], [sc_row("13", "Resident", [False] * 19)])
 assert w == []
 print("all allocator tests passed")

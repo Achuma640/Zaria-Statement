@@ -188,7 +188,7 @@ function lbl2(got,r){if(!got.length)return 'Part payment or credit';var ri=(+r[0
  return a.map(mlab2).join(', ')+(a.length&&f.length?'; ':'')+(f.length?'credit for '+f.map(mlab2).join(', '):'')}
 function mlab2(k){return MF[(k+4)%12].slice(0,3)+' '+(2025+Math.floor((k+4)/12))}
 function plotCard(){if(!pq)return '';var u=BAL.map&&BAL.map[pq];
- if(!u){var com=['1','106','148','156'].indexOf(pq)>-1;return '<div class="pcard"><h3>Plot '+esc(pq)+'</h3><p>'+(com?'Estate property (commercial centre, kindergarten, spa, recreation park). Not charged service charge.':'Plot not found in the register.')+'</p>'+lastRec()+'</div>'}
+ if(!u){var com=['1','106','148','156','194'].indexOf(pq)>-1;return '<div class="pcard"><h3>Plot '+esc(pq)+'</h3><p>'+(com?'Estate property (commercial centre, kindergarten, spa, recreation park, borehole). Not charged service charge.':'Plot not found in the register.')+'</p>'+lastRec()+'</div>'}
  var U=BAL.units[u],ci=curIdx(),R=unitOwe(U,ci),plots=Object.keys(BAL.map).filter(function(p){return BAL.map[p]===u&&p.indexOf('-')<0}).join(' & ');
  var head='Plot '+esc(plots)+(U.n?' &middot; '+esc(U.n):'')+(U.s?' ('+esc(U.s)+')':'');
  var ok=R.owe===0,nl=ci>=0?mlab(ci):'';
