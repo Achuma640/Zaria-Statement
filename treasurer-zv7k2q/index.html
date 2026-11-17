@@ -304,7 +304,7 @@ g('ugo').onclick=async function(){
    var d=await api('',JSON.stringify({code:code,ref:ref,tag:g('utag').value,note:g('unote').value,by:g('uby').value,mime:f.mime,data:f.data}));
    if(!d.ok)throw new Error(d.error==='bad code'?'that upload code was not accepted':d.error);
    ls('zrc',code);(RF[ref]=RF[ref]||[]).push([g('utag').value,d.link]);done++}
-  um('Saved '+done+' receipt'+(done>1?'s':'')+'. It now shows on the payment.','ok');g('ufile').value='';g('unote').value='';g('ucw').hidden=true;drawP();draw();setTimeout(function(){g('upn').hidden=true;g('ub').setAttribute('aria-expanded','false');g('ub').textContent='\u2713 Receipt saved. Upload another';setTimeout(function(){g('ub').textContent='\uD83D\uDCCE Upload a receipt'},6000)},1800)}
+  um('Saved '+done+' receipt'+(done>1?'s':'')+'. It now shows on the payment.','ok');g('ufile').value='';g('unote').value='';g('ucw').hidden=true;try{drawP();draw()}catch(e2){}setTimeout(function(){g('upn').hidden=true;g('ub').setAttribute('aria-expanded','false');g('ub').textContent='\u2713 Receipt saved. Upload another';setTimeout(function(){g('ub').textContent='\uD83D\uDCCE Upload a receipt'},6000)},1800)}
  catch(e){um('Not saved: '+e.message+(done?' ('+done+' saved first)':''),'er')}
  g('ugo').disabled=false};
 /* in-page receipt viewer: no Google sign-in needed */
