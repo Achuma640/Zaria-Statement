@@ -80,7 +80,7 @@ h2{font-size:16px;margin:2px 0 8px}
 .upn select[size]{padding:4px}
 .upn .go{background:var(--green);color:#fff;border:0;font-weight:800;margin-top:12px;min-height:48px;border-radius:10px;width:100%;font:inherit;cursor:pointer}.upn .go:disabled{opacity:.5}
 .upn .m{margin:8px 0 0;font-weight:700}.upn .m.ok{color:#1e8449}.upn .m.er{color:#c0392b}
-#rm[hidden]{display:none}#rm{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:50;display:flex;flex-direction:column;padding:10px}
+#ucl.req{color:#c0392b}#ucode.req{border:2px solid #c0392b;background:#fdecea}#rm[hidden]{display:none}#rm{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:50;display:flex;flex-direction:column;padding:10px}
 #rm .bar2{display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:700;padding:4px 2px 8px}
 #rm .bar2 button{background:#fff;border:0;border-radius:8px;min-height:44px;padding:0 18px;font:inherit;font-weight:800}
 #rm .bd{flex:1;overflow:auto;text-align:center;color:#fff}
@@ -94,7 +94,7 @@ h2{font-size:16px;margin:2px 0 8px}
 <div id="app" hidden>
 <button class="ubtn" id="ub" aria-expanded="false">📎 Upload a receipt</button>
 <div class="upn" id="upn" hidden>
-<div id="ucw"><label for="ucode">Upload code</label><input id="ucode" type="password" autocomplete="off"></div>
+<div id="ucw"><label for="ucode" id="ucl">Enter upload code</label><input id="ucode" type="password" autocomplete="off" placeholder="Enter upload code"></div>
 <label for="uq">Find the payment (payee, amount or ref)</label><input id="uq" placeholder="e.g. 4500 or Moses or UKF0">
 <label for="upay">Payment</label><select id="upay" size="6"></select>
 <label for="ufile">Receipt photo or PDF</label><input id="ufile" type="file" accept="image/*,application/pdf" multiple>
@@ -290,8 +290,9 @@ function pick(){var r=DATA.filter(function(x){return x[2]===g('upay').value})[0]
  var o=g('utag').options,c=r[7].toLowerCase().replace(/&/g,'and');for(var i=0;i<o.length;i++)if(o[i].text.toLowerCase().replace(/&/g,'and')===c){g('utag').selectedIndex=i;break}}
 g('utag').innerHTML=TG.map(function(t){return'<option>'+esc(t)+'</option>'}).join('');
 g('ub').onclick=function(){var p=g('upn'),o=p.hidden;p.hidden=!o;this.setAttribute('aria-expanded',o);
- if(o){var c=ls('zrc');if(c){g('ucode').value=c;g('ucw').hidden=true}g('uby').value=ls('zrb')||'';drawP()}};
-g('uq').oninput=drawP;g('upay').onchange=pick;
+ if(o){var c=ls('zrc');if(c){g('ucode').value=c;g('ucw').hidden=true}g('uby').value=ls('zrb')||'';ureq();drawP()}};
+function ureq(){var e=!g('ucode').value;g('ucl').classList.toggle('req',e);g('ucode').classList.toggle('req',e)}
+g('ucode').oninput=ureq;g('uq').oninput=drawP;g('upay').onchange=pick;
 function shrink(f){return new Promise(function(res,rej){
  if(f.type==='application/pdf'){var r=new FileReader();r.onload=function(){res({mime:f.type,data:r.result.split(',')[1]})};r.onerror=rej;r.readAsDataURL(f);return}
  var im=new Image(),u=URL.createObjectURL(f);im.onload=function(){var s=Math.min(1,1700/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res({mime:'image/jpeg',data:c.toDataURL('image/jpeg',.8).split(',')[1]})};im.onerror=rej;im.src=u})}
