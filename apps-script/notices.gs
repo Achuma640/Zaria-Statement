@@ -45,3 +45,9 @@ function doGet(e) {
   return HtmlService.createHtmlOutput('<p style="font:20px sans-serif">' + (a === 'approve' ?
     'Approved. It will show in the Zaria app within about 30 minutes.' : 'Rejected. It will not be shown.') + '</p>');
 }
+
+/** Run this once from the editor (select "authorize" in the toolbar, then Run) so Google asks for permission to send email. */
+function authorize() {
+  MailApp.sendEmail(COMMITTEE, 'Zaria notices script authorised', 'The notice approval emails will now be sent.');
+  SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB).getRange(1, 1).getValue();
+}
