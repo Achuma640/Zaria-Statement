@@ -16,7 +16,11 @@ function doPost(e) {
   const note = [p.guests ? 'Expected guests: ' + p.guests + '.' : '', p.details || ''].join(' ').trim();
   const title = p.kind || 'Notice';
   const when = p.date ? new Date(p.date + 'T00:00:00') : '';
-  sh.appendRow([false, when, p.start || '', p.where || '', title, p.contact || '', note, who, token, 'Pending']);
+  // first free row, judged by the Title column (the Approved column holds ready-made tick boxes)
+  const titles = sh.getRange(1, 5, sh.getMaxRows(), 1).getValues();
+  let r = 2; while (r <= titles.length && String(titles[r - 1][0]).trim() !== '') r++;
+  if (r > sh.getMaxRows()) sh.insertRowsAfter(sh.getMaxRows(), 20);
+  sh.getRange(r, 1, 1, 10).setValues([[false, when, p.start || '', p.where || '', title, p.contact || '', note, who, token, 'Pending']]);
   const url = ScriptApp.getService().getUrl();
   const link = function (a) { return url + '?a=' + a + '&t=' + token; };
   const body = 'New notice from the Estate tab\n\n' +
@@ -24,7 +28,7 @@ function doPost(e) {
     '\nPlot: ' + (p.contact || '') + '\nGuests: ' + (p.guests || '') + '\nDetails: ' + (p.details || '') +
     '\nFrom: ' + who + '\n\nAPPROVE (shows to residents): ' + link('approve') +
     '\n\nREJECT: ' + link('reject') + '\n\nIt appears in the app at the next update, within about 30 minutes of approval.';
-  MailApp.sendEmail(COMMITTEE, 'Zaria notice to approve: ' + title + ' ' + (p.date || ''), body);
+  try { MailApp.sendEmail(COMMITTEE, 'Zaria notice to approve: ' + title + ' ' + (p.date || ''), body); } catch (err) { sh.getRange(r, 11).setValue('Email failed: ' + err); }
   return ContentService.createTextOutput('ok');
 }
 

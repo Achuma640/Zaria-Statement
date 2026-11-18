@@ -11,9 +11,13 @@ for r in rows:
     ok, d, tm, where, title, plot, note = [str(x).strip() for x in r[:7]]
     if ok.upper() not in ("TRUE", "YES", "1") or not title:
         continue
-    try:
-        dd = datetime.date.fromisoformat(d[:10])
-    except ValueError:
+    dd = None
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+        try:
+            dd = datetime.datetime.strptime(d.split(" ")[0], fmt).date(); break
+        except ValueError:
+            pass
+    if dd is None:
         continue
     if dd < today:
         continue
