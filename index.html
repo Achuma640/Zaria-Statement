@@ -117,6 +117,7 @@ button{font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--line)
 <div class="toprow"><dl class="id"><dt>Plot</dt><dd id="plot"></dd><dt>Name</dt><dd id="name"></dd><dt>Status</dt><dd id="status"></dd></dl>
 <div id="lastpay" class="last"></div></div>
 <div id="paybox" class="paybox"></div>
+<div id="subbox" class="paybox" style="margin-top:10px"></div>
 <div class="bar"><span>Summary (KES)</span></div>
 <div class="scroll"><table class="sum"><thead><tr><th></th><th>2025</th><th>2026</th></tr></thead><tbody id="sum"></tbody></table></div>
 <div class="bar"><span>Service charge by month</span><span style="font-weight:400;font-size:12.5px">KES 5,000 a month, payable from May 2025</span></div>
@@ -196,6 +197,12 @@ function show(raw){
   pb.querySelectorAll('button').forEach(b=>b.onclick=()=>{const t=b.dataset.c,m=$('cpmsg');const done=()=>{m.textContent='Copied '+t;};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,()=>{m.textContent='Could not copy. Type '+t;});
     else{try{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();done();}catch(e){m.textContent='Could not copy. Type '+t;}}});}
+
+  {const sb=$('subbox'),pl=u.split('-')[0];let done=false;try{done=localStorage.getItem('zv_sub_'+pl)==='1'}catch(e){}
+  if(done){sb.innerHTML='<div class="ok">Thank you. We have your email for plot '+u+'.</div>';}
+  else{sb.innerHTML='<div class="pt2">Stay in touch: get estate news by email</div><form id="subf" style="display:grid;gap:8px"><input id="sbe" type="email" required autocomplete="email" placeholder="Your email address" style="min-height:44px;padding:0 10px;font-size:16px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg)"><input id="sbn" type="text" autocomplete="name" placeholder="Your name (optional)" style="min-height:44px;padding:0 10px;font-size:16px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg)"><label style="font-size:13px;display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="sbc" required style="margin-top:3px"><span>I agree that Zaria Village may email me estate announcements, approved events and notices for plot '+u+'. I can ask to be removed at any time.</span></label><button type="submit" style="min-height:44px;border:0;border-radius:8px;background:var(--green);color:#fff;font:700 15px var(--body);cursor:pointer">Subscribe</button><div class="ok" id="sbm" aria-live="polite"></div></form>';
+   $('subf').onsubmit=function(ev){ev.preventDefault();const up=new URLSearchParams();up.set('form-name','subscribe');up.set('plot',u);up.set('email',$('sbe').value.trim());up.set('name',$('sbn').value.trim());up.set('consent','yes');
+    fetch('https://script.google.com/macros/s/AKfycbzcIOphDkOHQFUtxE1tPJlDNk-r2zcnPBmjKfv-O41JKat3RaWrC5AbTQ43sLJgS6Zb/exec',{method:'POST',body:up,mode:'no-cors'}).then(function(){try{localStorage.setItem('zv_sub_'+pl,'1')}catch(e){}sb.innerHTML='<div class="ok">Thank you. We have your email for plot '+u+'.</div>';}).catch(function(){$('sbm').textContent='Could not send. Please try again.';});};}}
   $('plot').textContent=u;$('name').textContent=info[0];$('status').textContent=info[1];
   {const lp=mine.slice().sort((x,y)=>{const kx=x[0]+(x[8]||''),ky=y[0]+(y[8]||'');return kx<ky?1:kx>ky?-1:0})[0];const t12=t=>{if(!t)return '';const [h,m]=t.split(':').map(Number);return (h%12||12)+':'+String(m).padStart(2,'0')+(h<12?'am':'pm')};const el=$('lastpay');
   if(lp){const dt=new Date(lp[0]+'T00:00:00');el.innerHTML='<span class="ll">Last payment</span><span class="lv">'+dt.getDate()+' '+MN[dt.getMonth()]+' '+dt.getFullYear()+(lp[8]?' at '+t12(lp[8]):'')+'</span><span class="la">KES '+fmt(lp[2])+' · '+(lp[7]==='General'?'Service charge':lp[7]==='Road'?'Road':lp[7])+'</span>';}

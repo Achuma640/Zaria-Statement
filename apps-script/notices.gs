@@ -10,6 +10,13 @@ const SHEET_ID = '1E9q6ot6hEpbIsJujR72FJ24i1eZcH5SWNAk930pMRfY';
 
 function doPost(e) {
   const p = e.parameter || {};
+  if (p['form-name'] === 'subscribe') {
+    const ss = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Subscribers');
+    const em = String(p.email || '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return ContentService.createTextOutput('bad');
+    ss.appendRow([new Date(), String(p.plot || ''), p.name || '', em, p.phone || '', 'Agreed to estate emails']);
+    return ContentService.createTextOutput('ok');
+  }
   const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
   const token = Utilities.getUuid().replace(/-/g, '').slice(0, 20);
   const who = [p.name, p.phone, p.email].filter(String).join(' | ');
