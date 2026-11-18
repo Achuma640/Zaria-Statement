@@ -14,7 +14,9 @@ function doPost(e) {
     const ss = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Subscribers');
     const em = String(p.email || '').trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return ContentService.createTextOutput('bad');
-    ss.appendRow([new Date(), String(p.plot || ''), p.name || '', em, p.phone || '', 'Agreed to estate emails']);
+    const em2 = String(p.email2 || '').trim();
+    const ok2 = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em2);
+    ss.appendRow([new Date(), String(p.plot || ''), p.name || '', em, p.phone || '', 'Agreed to estate emails', ok2 ? em2 : '']);
     return ContentService.createTextOutput('ok');
   }
   const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
