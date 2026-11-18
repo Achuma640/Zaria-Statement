@@ -8,7 +8,7 @@ from google.auth.transport.requests import AuthorizedSession
 
 SHEET = "1E9q6ot6hEpbIsJujR72FJ24i1eZcH5SWNAk930pMRfY"
 RANGES = {"transactions.json": "Transactions!A1:R3007", "service_charge.json": "'Service Charge'!A7:BU82",
-          "receipt_files.json": "'Receipt Files'!A1:I3000"}
+          "receipt_files.json": "'Receipt Files'!A1:I3000", "notices.json": "Notices!A1:H200"}
 creds = service_account.Credentials.from_service_account_info(
     json.loads(os.environ["GOOGLE_SA_KEY"]), scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"])
 s = AuthorizedSession(creds)
