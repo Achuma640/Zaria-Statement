@@ -31,7 +31,10 @@ function doPost(e) {
     const nm = ws.getRange(1, 3, ws.getMaxRows(), 1).getValues();
     let wr = 2; while (wr <= nm.length && String(nm[wr - 1][0]).trim() !== '') wr++;
     if (wr > ws.getMaxRows()) ws.insertRowsAfter(ws.getMaxRows(), 20);
-    ws.getRange(wr, 1, 1, 9).setValues([[false, p.trade, p.wname, p.wphone || '', p.note || '', p.plot || '', tk, 'Pending', p.name || '']]);
+    ws.getRange(wr, 4).setNumberFormat('@');
+    let ph = String(p.wphone || '').replace(/[^0-9]/g, '');
+    if (ph.indexOf('254') === 0 && ph.length === 12) ph = '0' + ph.slice(3); else if (ph.length === 9) ph = '0' + ph;
+    ws.getRange(wr, 1, 1, 9).setValues([[false, p.trade, p.wname, ph, p.note || '', p.plot || '', tk, 'Pending', p.name || '']]);
     const wl = function (a) { return ScriptApp.getService().getUrl() + '?a=' + a + '&t=' + tk; };
     try { MailApp.sendEmail(COMMITTEE, 'Zaria worker to approve: ' + p.wname + ' (' + p.trade + ')',
       'New worker recommendation\n\nTrade: ' + p.trade + '\nName: ' + p.wname + '\nPhone: ' + (p.wphone || '') + '\nNote: ' + (p.note || '') +
