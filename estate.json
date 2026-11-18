@@ -12,6 +12,22 @@
  ],
  "notices": [],
  "sponsors": [],
- "agm": [],
- "formsLive": ["book","notice"]
+ "agm": [
+  {
+   "title": "AGM resolutions, 4 July 2026",
+   "date": "4 July 2026",
+   "note": "Extracts of the resolutions passed: constitution, membership fees, the committee and the bank account.",
+   "link": "https://statement.zariavillage.co.ke/agm/AGM_Resolutions_4Jul2026.pdf"
+  },
+  {
+   "title": "AGM minutes, 4 July 2026",
+   "date": "4 July 2026",
+   "note": "Full minutes of the Annual General Meeting held at Zaria Village.",
+   "link": "https://statement.zariavillage.co.ke/agm/AGM_Minutes_4Jul2026.pdf"
+  }
+ ],
+ "formsLive": [
+  "book",
+  "notice"
+ ]
 }
