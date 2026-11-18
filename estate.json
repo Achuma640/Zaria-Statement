@@ -30,13 +30,5 @@
   "book",
   "notice"
  ],
- "events": [
-  {
-   "date": "2026-11-22",
-   "time": "13:35",
-   "where": "264",
-   "title": "Party, plot 264",
-   "note": "Expected guests: 25. Test new"
-  }
- ]
+ "events": []
 }
