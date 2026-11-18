@@ -214,7 +214,7 @@ function show(raw){
   let r27='<tr><td>2027</td>';for(let i=2;i<14;i++)r27+=ah(i);r27+='</tr>';
   $('mb').innerHTML=r25+r26+r27;
   const np=(a,b)=>{const l=[];for(let i=a;i<b;i++)if(!V.cov[i]&&!(V.nd&&i<V.nd))l.push(MN[i<8?4+i:i-8]);return l.length?l.join(' '):'None - all months covered';};
-  (function(){const n=[];for(let i=0;i<=Math.min(NC-1,ci);i++)if(!V.cov[i]&&!(V.nd&&i<V.nd))n.push(i);const ab=$('arr');if(n.length){ab.innerHTML='Arrears: '+n.length+(n.length===1?' month':' months')+' of service charge not yet paid.<small>Paybill 820820, account 1136#'+u+'. Please pay or agree a payment plan with the treasurer.</small>';ab.hidden=false}else ab.hidden=true})();
+  (function(){const n=[];for(let i=0;i<=Math.min(NC-1,ci);i++)if(!V.cov[i]&&!(V.nd&&i<V.nd))n.push(i);const ab=$('arr');if(n.length){ab.innerHTML='Arrears: '+n.length+(n.length===1?' month':' months')+' of service charge not yet paid.<small>Paybill 820820, account 1136#'+u+'. '+(n.length>3?'Please pay or agree a payment plan with the treasurer.':'Please clear it to stay up to date.')+'</small>';ab.hidden=false}else ab.hidden=true})();
   $('np25').textContent=np(0,8);$('np26').textContent=np(8,Math.min(NC,ci+1));$('cr').textContent=fmt(V.credit||0);
   const ns=D.N.filter(n=>n[0]===u);
   $('nbox').hidden=false;$('notes').innerHTML=ns.length?ns.map(n=>`<li><b>${n[1]}:</b> ${n[2]}</li>`).join(''):'<li>No notes on this account.</li>';
