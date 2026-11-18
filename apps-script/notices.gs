@@ -1,15 +1,16 @@
 /**
  * Zaria notices: receives a notice from the Estate tab, adds it to the "Notices" tab (NOT approved),
  * and emails the committee a one-tap Approve / Reject link.
- * Setup: Sheet > Extensions > Apps Script > paste this file > set COMMITTEE below > Deploy > New deployment >
+ * Setup: script.google.com > New project (separate from the receipt uploader) > paste this file > set COMMITTEE > Deploy > New deployment >
  * type "Web app", Execute as "Me", Who has access "Anyone" > copy the web app URL.
  */
 const COMMITTEE = 'andy.chuma@gmail.com';   // comma-separated committee emails that receive notices
 const TAB = 'Notices';
+const SHEET_ID = '1E9q6ot6hEpbIsJujR72FJ24i1eZcH5SWNAk930pMRfY';
 
 function doPost(e) {
   const p = e.parameter || {};
-  const sh = SpreadsheetApp.getActive().getSheetByName(TAB);
+  const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
   const token = Utilities.getUuid().replace(/-/g, '').slice(0, 20);
   const who = [p.name, p.phone, p.email].filter(String).join(' | ');
   const note = [p.guests ? 'Expected guests: ' + p.guests + '.' : '', p.details || ''].join(' ').trim();
@@ -29,7 +30,7 @@ function doPost(e) {
 
 function doGet(e) {
   const a = (e.parameter || {}).a, t = (e.parameter || {}).t;
-  const sh = SpreadsheetApp.getActive().getSheetByName(TAB);
+  const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
   const tokens = sh.getRange(1, 9, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]); });
   const i = t ? tokens.indexOf(t) : -1;
   if (i < 1) return HtmlService.createHtmlOutput('<p>Link not found or already used.</p>');
