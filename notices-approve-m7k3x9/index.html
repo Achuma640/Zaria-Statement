@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Zaria notices: committee approval</title>
+<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:#eef3ec;color:#1b2a22}header{background:#1f5733;color:#fff;padding:16px;border-bottom:4px solid #d9b452}h1{margin:0;font-size:20px}main{max-width:720px;margin:0 auto;padding:14px}
+.card{background:#fff;border:1px solid #cfd9cf;border-radius:12px;padding:14px;margin:0 0 12px}.card b{font-size:17px}.meta{color:#555;font-size:14px;margin:4px 0}.row{display:flex;gap:10px;margin-top:10px}
+button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:12px 16px;cursor:pointer}.ok{background:#1f5733;color:#fff;flex:1}.no{background:#c62828;color:#fff;flex:1}.ghost{background:#e5ebe3}input{font:inherit;padding:12px;border:1px solid #aab8aa;border-radius:8px;width:100%;margin:8px 0}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:99px;background:#fff3cd}.tag.a{background:#d4edda}.tag.r{background:#f8d7da}h2{font-size:16px;margin:18px 0 8px}</style></head><body>
+<header><h1>Zaria notices: committee approval</h1></header><main id="m"></main>
+<script>
+var U='https://script.google.com/macros/s/AKfycbzcIOphDkOHQFUtxE1tPJlDNk-r2zcnPBmjKfv-O41JKat3RaWrC5AbTQ43sLJgS6Zb/exec',m=document.getElementById('m');
+function q(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function code(){try{return sessionStorage.getItem('zc')||''}catch(e){return ''}}
+function login(msg){m.innerHTML='<div class="card"><b>Committee code</b><div class="meta">'+(msg||'Enter the committee code to see notices waiting for approval.')+'</div><input id="c" type="password" autocomplete="off" placeholder="Code"><button class="ok" id="go" style="width:100%">Open</button></div>';
+ document.getElementById('go').onclick=function(){try{sessionStorage.setItem('zc',document.getElementById('c').value.trim())}catch(e){}load()}}
+function card(x){var t=x.approved?'<span class="tag a">Approved</span>':x.status==='Rejected'?'<span class="tag r">Rejected</span>':'<span class="tag">Waiting</span>';
+ return '<div class="card">'+t+' <b>'+q(x.title)+(x.plot?', plot '+q(x.plot):'')+'</b><div class="meta">'+q(x.date)+(x.time?' at '+q(x.time):'')+(x.where?' &middot; '+q(x.where):'')+'</div><div>'+q(x.note)+'</div><div class="meta">From: '+q(x.by)+'</div>'+
+ '<div class="row">'+(x.approved?'':'<button class="ok" data-r="'+x.row+'" data-v="approve">Approve</button>')+(x.status==='Rejected'?'':'<button class="no" data-r="'+x.row+'" data-v="reject">'+(x.approved?'Withdraw':'Reject')+'</button>')+'</div></div>'}
+function load(){m.innerHTML='<div class="card">Loading...</div>';
+ fetch(U+'?a=list&code='+encodeURIComponent(code())).then(function(r){return r.json()}).then(function(j){
+  if(!j.ok){try{sessionStorage.removeItem('zc')}catch(e){}login('That code was not accepted.');return}
+  var w=j.rows.filter(function(x){return !x.approved&&x.status!=='Rejected'}),o=j.rows.filter(function(x){return x.approved||x.status==='Rejected'}).slice(0,15);
+  m.innerHTML='<h2>Waiting for approval ('+w.length+')</h2>'+(w.length?w.map(card).join(''):'<div class="card">Nothing is waiting.</div>')+'<h2>Recent</h2>'+(o.length?o.map(card).join(''):'<div class="card">None yet.</div>')+'<p class="meta">Approved notices show in the app within about 30 minutes.</p><button class="ghost" id="rf">Refresh</button>';
+  document.getElementById('rf').onclick=load;
+  [].forEach.call(m.querySelectorAll('[data-r]'),function(b){b.onclick=function(){b.disabled=true;b.textContent='Saving...';
+   fetch(U+'?a=set&r='+b.dataset.r+'&v='+b.dataset.v+'&code='+encodeURIComponent(code())).then(function(r){return r.json()}).then(function(){load()}).catch(function(){b.textContent='Failed, try again';b.disabled=false})}})
+ }).catch(function(){m.innerHTML='<div class="card">Could not load. Check your connection and refresh.</div>'})}
+if(code())load();else login();
+</script></body></html>

@@ -32,9 +32,25 @@ function doPost(e) {
   return ContentService.createTextOutput('ok');
 }
 
+function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+function codeOk_(c) { const k = PropertiesService.getScriptProperties().getProperty('APPROVE_CODE'); return !!k && String(c || '') === k; }
+
 function doGet(e) {
   const a = (e.parameter || {}).a, t = (e.parameter || {}).t;
   const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
+  // Committee approval page: list pending notices / approve or reject one. Needs the APPROVE_CODE script property.
+  if (a === 'list' || a === 'set') {
+    if (!codeOk_((e.parameter || {}).code)) return json_({ ok: false, error: 'code' });
+    if (a === 'list') {
+      const v = sh.getRange(1, 1, sh.getLastRow(), 10).getDisplayValues(), out = [];
+      for (let i = 1; i < v.length; i++) if (v[i][4]) out.push({ row: i + 1, approved: v[i][0] === 'TRUE', date: v[i][1], time: v[i][2], where: v[i][3], title: v[i][4], plot: v[i][5], note: v[i][6], by: v[i][7], status: v[i][9] });
+      return json_({ ok: true, rows: out.reverse() });
+    }
+    const row = parseInt(e.parameter.r, 10), act = e.parameter.v;
+    if (!(row >= 2) || String(sh.getRange(row, 5).getValue()).trim() === '') return json_({ ok: false, error: 'row' });
+    sh.getRange(row, 1).setValue(act === 'approve'); sh.getRange(row, 10).setValue(act === 'approve' ? 'Approved' : 'Rejected');
+    return json_({ ok: true });
+  }
   const tokens = sh.getRange(1, 9, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]); });
   const i = t ? tokens.indexOf(t) : -1;
   if (i < 1) return HtmlService.createHtmlOutput('<p>Link not found or already used.</p>');
