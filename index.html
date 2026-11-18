@@ -328,6 +328,7 @@ $('theme').addEventListener('click',()=>{const r=document.documentElement;const 
     if(!FORMS_URL){say('Sending is not switched on yet. Please try again soon.','bad');return}
     fd.set('form-name',view);Object.keys(files).forEach(function(i){fd.set('photo'+i,files[i],'photo'+i+'.jpg')});
     btn.disabled=true;say('Sending...','ok');
+    if(view==='notice'){try{var up=new URLSearchParams();fd.forEach(function(v,k){if(typeof v==='string'&&k!=='bot-field')up.set(k,v)});fetch('https://script.google.com/macros/s/AKfycbzcIOphDkOHQFUtxE1tPJlDNk-r2zcnPBmjKfv-O41JKat3RaWrC5AbTQ43sLJgS6Zb/exec',{method:'POST',body:up,mode:'no-cors'}).catch(function(){})}catch(e){}}
     fetch(FORMS_URL.replace(/\/+$/,'')+'/',{method:'POST',body:fd,mode:'no-cors'}).then(function(){f.reset();[].forEach.call(f.querySelectorAll('.ph img'),function(i){i.remove()});[].forEach.call(f.querySelectorAll('.chip'),function(c){c.setAttribute('aria-pressed','false')});files={};say('Thank you. Your message has been sent to the committee.','ok');btn.disabled=false})
       .catch(function(){say('Could not send. Check your connection and try again.','bad');btn.disabled=false})}
   if(location.hash==='#estate')show('estate');
