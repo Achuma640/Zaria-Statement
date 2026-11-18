@@ -32,6 +32,13 @@ input[type=text],input[type=tel],input[type=email],textarea{width:100%;backgroun
   <input type="file" name="photo1"><input type="file" name="photo2"><input type="file" name="photo3">
 </form>
 
+<form name="book" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="amenity"><input name="date"><input name="start"><input name="end"><input name="purpose"><input name="guests"><input name="name"><input name="contact"><input name="phone"><input name="email">
+</form>
+<form name="notice" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field"><input name="kind"><input name="date"><input name="start"><input name="where"><input name="guests"><textarea name="details"></textarea><input name="name"><input name="contact"><input name="phone"><input name="email">
+</form>
+
 <script>
 (function(){
 var root=document.getElementById('root'),view=(location.hash||'').replace('#','');
