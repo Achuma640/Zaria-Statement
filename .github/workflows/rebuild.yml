@@ -40,6 +40,7 @@ jobs:
           python3 tools/refresh_statement.py "$RUNNER_TEMP/sheet/transactions.json" "$RUNNER_TEMP/sheet/service_charge.json" --write
           python3 tools/make_map_page.py
           python3 tools/build_events.py "$RUNNER_TEMP/sheet/notices.json"
+          python3 tools/build_workers.py "$RUNNER_TEMP/sheet/workers.json" "$RUNNER_TEMP/sheet/worker_votes.json"
       - if: steps.gate.outputs.run == 'true'
         name: Commit if changed
         run: |

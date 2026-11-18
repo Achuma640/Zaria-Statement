@@ -19,6 +19,26 @@ function doPost(e) {
     ss.appendRow([new Date(), String(p.plot || ''), p.name || '', em, p.phone || '', 'Agreed to estate emails', ok2 ? em2 : '']);
     return ContentService.createTextOutput('ok');
   }
+  if (p['form-name'] === 'vote') {
+    const vs = SpreadsheetApp.openById(SHEET_ID).getSheetByName('WorkerVotes');
+    if (p.id && p.plot) vs.appendRow([new Date(), String(p.id), String(p.plot)]);
+    return ContentService.createTextOutput('ok');
+  }
+  if (p['form-name'] === 'worker') {
+    const ws = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Workers');
+    if (!p.wname || !p.trade) return ContentService.createTextOutput('bad');
+    const tk = Utilities.getUuid().replace(/-/g, '').slice(0, 20);
+    const nm = ws.getRange(1, 3, ws.getMaxRows(), 1).getValues();
+    let wr = 2; while (wr <= nm.length && String(nm[wr - 1][0]).trim() !== '') wr++;
+    if (wr > ws.getMaxRows()) ws.insertRowsAfter(ws.getMaxRows(), 20);
+    ws.getRange(wr, 1, 1, 9).setValues([[false, p.trade, p.wname, p.wphone || '', p.note || '', p.plot || '', tk, 'Pending', p.name || '']]);
+    const wl = function (a) { return ScriptApp.getService().getUrl() + '?a=' + a + '&t=' + tk; };
+    try { MailApp.sendEmail(COMMITTEE, 'Zaria worker to approve: ' + p.wname + ' (' + p.trade + ')',
+      'New worker recommendation\n\nTrade: ' + p.trade + '\nName: ' + p.wname + '\nPhone: ' + (p.wphone || '') + '\nNote: ' + (p.note || '') +
+      '\nRecommended by plot ' + (p.plot || '') + ' ' + (p.name || '') + '\n\nAPPROVE (shows to residents): ' + wl('approve') + '\n\nREJECT: ' + wl('reject')); }
+    catch (err) { ws.getRange(wr, 10).setValue('Email failed: ' + err); }
+    return ContentService.createTextOutput('ok');
+  }
   const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
   const token = Utilities.getUuid().replace(/-/g, '').slice(0, 20);
   const who = [p.name, p.phone, p.email].filter(String).join(' | ');
@@ -59,6 +79,16 @@ function doGet(e) {
     if (!(row >= 2) || String(sh.getRange(row, 5).getValue()).trim() === '') return json_({ ok: false, error: 'row' });
     sh.getRange(row, 1).setValue(act === 'approve'); sh.getRange(row, 10).setValue(act === 'approve' ? 'Approved' : 'Rejected');
     return json_({ ok: true });
+  }
+  const wsh = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Workers');
+  if (t && wsh && wsh.getLastRow() > 1) {
+    const wt = wsh.getRange(1, 7, wsh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]); }), wi = wt.indexOf(t);
+    if (wi >= 1) {
+      if (a === 'approve') { wsh.getRange(wi + 1, 1).setValue(true); wsh.getRange(wi + 1, 8).setValue('Approved'); }
+      else if (a === 'reject') { wsh.getRange(wi + 1, 1).setValue(false); wsh.getRange(wi + 1, 8).setValue('Rejected'); }
+      else return HtmlService.createHtmlOutput('<p>Unknown action.</p>');
+      return HtmlService.createHtmlOutput('<p style="font:20px sans-serif">' + (a === 'approve' ? 'Approved. It will be listed in the Zaria app within about 30 minutes.' : 'Rejected. It will not be listed.') + '</p>');
+    }
   }
   const tokens = sh.getRange(1, 9, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]); });
   const i = t ? tokens.indexOf(t) : -1;
