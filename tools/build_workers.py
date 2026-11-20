@@ -6,10 +6,11 @@ W = json.load(open(sys.argv[1])).get("values", [])[1:]
 V = json.load(open(sys.argv[2])).get("values", [])[1:]
 seen = {}
 for r in V:
-    r = list(r) + [""] * 3
+    r = list(r) + [""] * 4
     wid, plot = str(r[1]).strip(), re.sub(r"\s+", "", str(r[2]).lower())
+    d = -1 if str(r[3]).strip() in ("-1", "down") else 1   # older rows have no direction: they were up-votes
     if wid and plot:
-        seen.setdefault(wid, set()).add(plot)
+        seen.setdefault(wid, {})[plot] = d   # one vote per plot per worker; the latest row wins
 def phone(p):
     """Kenyan numbers: Sheets drops the leading 0 (712280152), so restore it. 254/+254 forms become 0..."""
     d = re.sub(r"\D", "", p)
@@ -25,7 +26,8 @@ for i, r in enumerate(W, start=2):
     if ok.upper() not in ("TRUE", "YES", "1") or not name or not trade:
         continue
     out.append({"id": str(i), "trade": trade, "name": name, "phone": phone(phone_raw), "note": note,
-                "by": by, "votes": len(seen.get(str(i), ()))})
+                "by": by, "votes": sum(seen.get(str(i), {}).values()),
+                "up": sum(1 for d in seen.get(str(i), {}).values() if d > 0), "down": sum(1 for d in seen.get(str(i), {}).values() if d < 0)})
 out.sort(key=lambda w: (w["trade"], -w["votes"], w["name"]))
 j = json.load(open("estate.json"))
 if j.get("workers") != out:

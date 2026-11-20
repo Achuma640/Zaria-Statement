@@ -21,7 +21,7 @@ function doPost(e) {
   }
   if (p['form-name'] === 'vote') {
     const vs = SpreadsheetApp.openById(SHEET_ID).getSheetByName('WorkerVotes');
-    if (p.id && p.plot) vs.appendRow([new Date(), String(p.id), String(p.plot)]);
+    if (p.id && p.plot) vs.appendRow([new Date(), String(p.id), String(p.plot), String(p.dir) === '-1' ? -1 : 1]);
     return ContentService.createTextOutput('ok');
   }
   if (p['form-name'] === 'worker') {
