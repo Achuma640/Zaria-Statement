@@ -8,7 +8,7 @@ Writes a JSON plan (--out) of cell updates for the Sheet and prints a summary.
 It never writes to the Sheet itself, so either treasurer's Claude can review and apply it.
 
 Rules (see HANDOFF.md): General receipts only; oldest unpaid due month first; monthly rate
-5,000 (5,500 where the plot has paid 5,500 before); remainder carries to the next receipt
+5,000 always (anything paid above 5,000 is carried forward as credit); remainder carries to the next receipt
 (column BU of the Service Charge tab); months before the plot's "due from" (BT) are skipped;
 only Resident/Building units are charged.
 """
@@ -47,7 +47,7 @@ def plan(tx_rows, sc_rows, first_sc_row=7, tx_first_row=2):
         if not r[0] or r[0] == "TOTAL":
             continue
         rcvd = [num(x) for x in r[RCVD0:RCVD0 + 19]]
-        rate = 5500 if any(abs(x - 5500) < 1 for x in rcvd) else 5000
+        rate = 5000
         units[r[0]] = dict(
             row=first_sc_row + i, status=r[2], rate=rate,
             nd=max(int(num(r[COL_BT]) or 1) - 1, 0),

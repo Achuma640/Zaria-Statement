@@ -54,7 +54,7 @@ def units(U, sc):
         cr = _f(r[22])
         if r[2] in ("Resident", "Building", "") and u["s"] != r[2]:     # status changed in the Sheet
             u["s"] = r[2]; changed.append(r[0])
-        rate = 5500 if any(abs(_f(x) - 5500) < 1 for x in r[30:49]) else 5000
+        rate = 5000
         if u.get("ah") and str(r[68]).upper() == "TRUE":       # credit beyond Nov 26 -> paid-ahead months
             for j in range(1, min(int(_f(r[72]) // rate), 13) + 1):
                 if u["ah"][j] == 0:

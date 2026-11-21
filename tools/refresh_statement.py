@@ -50,7 +50,7 @@ def update(D, tx, sc, log=print):
             log("unit not on statement page:", row[0]); continue
         nd = int(num(row[71]) or 1) - 1
         rcvd = [num(x) for x in row[30:49]]
-        rate = 5500 if any(abs(x - 5500) < 1 for x in rcvd) else 5000
+        rate = 5000
         if row[2] in ("Resident", "Building", "") and D["U"][row[0]][1] != row[2]:   # status changed in the Sheet
             D["U"][row[0]][1] = row[2]
             log("plot", row[0], "status ->", row[2])
@@ -70,7 +70,7 @@ def update(D, tx, sc, log=print):
         if not v or not v["cov"][18]:
             continue
         rcvd = [num(x) for x in row[30:49]]
-        rate = 5500 if any(abs(x - 5500) < 1 for x in rcvd) else 5000
+        rate = 5000
         n = int(num(row[72]) // rate)
         for j in range(1, min(n, 13) + 1):
             if v["ahead"][j] == 0:
