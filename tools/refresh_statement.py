@@ -54,7 +54,7 @@ def update(D, tx, sc, log=print):
         if row[2] in ("Resident", "Building", "") and D["U"][row[0]][1] != row[2]:   # status changed in the Sheet
             D["U"][row[0]][1] = row[2]
             log("plot", row[0], "status ->", row[2])
-        v["credit"] = num(row[22])
+        v["credit"] = num(row[22]) + num(row[72])      # column W + the carried credit in BU
         if nd:
             v["nd"] = nd
         for i in range(19):
@@ -67,7 +67,12 @@ def update(D, tx, sc, log=print):
     for row in sc:                         # credit beyond the last Sheet month (Nov 26) -> paid-ahead months
         row = row + [""] * (73 - len(row))
         v = V.get(row[0])
-        if not v or not v["cov"][18]:
+        if not v:
+            continue
+        if not v["cov"][18]:             # Nov 26 not yet covered: carried credit shows as part-paid Nov 26 when nothing earlier is unpaid
+            nd1 = v.get("nd", 0)
+            if all(v["cov"][i] for i in range(nd1, 18)) and 0 < num(row[72]) < 5000:
+                v["ahead"][0] = num(row[72])
             continue
         rcvd = [num(x) for x in row[30:49]]
         rate = 5000
