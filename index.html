@@ -214,7 +214,7 @@ function show(raw){
   $('sum').innerHTML=`<tr><td>Service charge &amp; AGM</td><td>${fmt(s.a[0])}</td><td>${fmt(s.a[1])}</td></tr><tr><td>Road contributions</td><td>${fmt(s.b[0])}</td><td>${fmt(s.b[1])}</td></tr><tr><td>TOTAL PAID</td><td>${fmt(s.a[0]+s.b[0])}</td><td>${fmt(s.a[1]+s.b[1])}</td></tr>`;
   // months: idx 0..7 = May-Dec 2025, 8..17 = Jan-Oct 2026
   const gen=(y,m)=>mine.filter(p=>p[7]==='General'&&+p[0].slice(0,4)===y&&+p[0].slice(5,7)===m).reduce((a,p)=>a+p[2],0);
-  const amt=i=>{ if(i>=18) return (V.ahead||[])[i-18]||0; if(V.disp&&V.disp[i]<0) return 0; if(V.disp&&V.disp[i]>0) return V.disp[i]; if(V.master&&i<14) return V.rec[i]||0; return i<8?gen(2025,5+i):gen(2026,i-7); };
+  const amt=i=>{ if(i>=18) return (V.ahead||[])[i-18]||0; if(V.disp&&V.disp[i]<0) return 0; if(V.disp&&V.disp[i]>0) return V.disp[i]; if(V.master&&i<14) return V.rec[i]||0; const g=i<8?gen(2025,5+i):gen(2026,i-7);return g===5500?5000:g; };
   const cell=i=>{if(V.nd&&i<V.nd)return '<td class="na">n/a</td>';const a=amt(i);if(i>ci)return a>0?`<td class="${V.cov[i]?'pd':'pt'}">${fmt(a)}</td>`:'<td class="na">–</td>';return a>0?`<td>${fmt(a)}</td>`:V.cov[i]?'<td class="pd">Paid*</td>':'<td class="no">0</td>';};
   $('mh').innerHTML='<tr><th>Year</th>'+MN.map(m=>`<th>${m}</th>`).join('')+'</tr>';
   let r25='<tr><td>2025</td>'+['','','',''].map(()=>'<td class="na">–</td>').join('');for(let i=0;i<8;i++)r25+=cell(i);r25+='</tr>';
