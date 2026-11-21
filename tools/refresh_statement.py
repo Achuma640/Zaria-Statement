@@ -82,6 +82,9 @@ def update(D, tx, sc, log=print):
                 v["ahead"][j] = rate
                 newahead.setdefault(row[0], []).append(18 + j)
                 log("plot", row[0], "paid ahead month", 18 + j)
+        rem = num(row[72]) - n * rate        # part of a month left over: show it as part-paid in the next month
+        if 0 < rem < rate and n + 1 <= 13 and v["ahead"][n + 1] < rate:
+            v["ahead"][n + 1] = rem
     seen = " ".join(n[2] for n in N)
     plot_unit = {p: k for k in V for p in k.split("-")}
     for r in tx:                           # note for each held-credit receipt that now shows as paid ahead
