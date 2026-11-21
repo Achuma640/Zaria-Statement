@@ -231,7 +231,7 @@ function show(raw){
   const dd=d=>{const x=new Date(d+'T00:00:00');return String(x.getDate()).padStart(2,'0')+'-'+MN[x.getMonth()]+'-'+x.getFullYear();};
   const AM=monthsApplied(mine,V);
   $('hnote').hidden=!AM.approx;
-  $('hb').innerHTML=mine.length?mine.map((p,i)=>`<tr><td>${i+1}</td><td>${dd(p[0])}</td><td>${p[8]||''}</td><td>${p[1]}</td><td class="n">${fmt(p[2])}</td><td>${AM.by.get(p)||''}</td><td>${esc(p[3])}</td><td>${esc(p[4])}</td><td>${p[7]}</td></tr>`).join(''):'<tr><td colspan="9">No payments found.</td></tr>';
+  $('hb').innerHTML=mine.length?mine.map((p,i)=>`<tr><td>${i+1}</td><td>${dd(p[0])}</td><td>${p[8]||''}</td><td>${p[1]}</td><td class="n">${fmt(p[2])}${p[7]==='General'&&p[2]===5500?'<small style="display:block;font-weight:400;opacity:.75">5,000 + 500 credit</small>':''}</td><td>${AM.by.get(p)||''}</td><td>${esc(p[3])}</td><td>${esc(p[4])}</td><td>${p[7]}</td></tr>`).join(''):'<tr><td colspan="9">No payments found.</td></tr>';
 }
 // Which month each service-charge payment was applied to: payments are laid against the months this plot
 // is shown as covered, oldest first, each month taking its own amount (5,000 or 5,500).
