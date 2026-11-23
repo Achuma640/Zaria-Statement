@@ -1,6 +1,6 @@
 /* Zaria Village: keeps the statement page available when the phone is offline.
    Only the statement page itself is handled; the locked reports are never cached here. */
-const CACHE = 'zaria-statement-v9';
+const CACHE = 'zaria-statement-v10';
 const SHELL = ['./', 'manifest.webmanifest', 'icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
