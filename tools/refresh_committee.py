@@ -42,6 +42,8 @@ def units(U, sc):
     """Refresh coverage c (18 months May25-Oct26), credit cr and not-due nd from the Service Charge export
     ('Service Charge'!A7:BU82). Names n, status s and notes t are kept. Returns the changed unit keys."""
     changed = []
+    if "224-225" in U and "225-226" not in U:       # unit renamed 224-225 -> 225-226 (23 Nov 2026)
+        U["225-226"] = U.pop("224-225"); changed.append("225-226")
     for r in sc:
         r = r + [""] * (73 - len(r))
         u = U.get(str(r[0]))

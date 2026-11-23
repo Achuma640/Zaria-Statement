@@ -29,7 +29,7 @@ def update(D, tx, sc, log=print):
     new.sort(key=lambda t: t[0])
     pu = {p: k for k in V for p in k.split("-")}
     for d, r in new:
-        r = list(r); r[7] = pu.get(str(r[7]).strip(), str(r[7]))     # double-plot units are keyed "224-225"
+        r = list(r); r[7] = pu.get(str(r[7]).strip(), str(r[7]))     # double-plot units are keyed e.g. "225-226"
         P.append([d.strftime("%Y-%m-%d"), r[1], num(r[3]) if num(r[3]) % 1 else int(num(r[3])), r[5], r[6],
                   str(r[7]), "", r[9], d.strftime("%H:%M")])
         label = r[17]

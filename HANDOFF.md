@@ -23,7 +23,7 @@ Everything else (GitHub pages, Excel files, payment-map PDFs, residents deck, fl
 - Receipts of 15,000 and above are service charge from 1 Oct 2026 unless marked road.
 - Service charge is due from the 5th and active from the 6th.
 - Plots 106, 148, 156 and 194 (borehole) are not charged. A plot's charge is due only from its "Due from" month.
-- Arrears counts only Resident and Building units. 159-160 is one Building unit; 224-225 is one unit.
+- Arrears counts only Resident and Building units. 159-160 is one Building unit; 225-226 is one unit (renamed from 224-225 on 23 Nov 2026).
 - Plot 65: the KES 20,000 of 24 Oct 2026 (UJOOI029VY) is **service charge** (decided 12 Nov 2026).
 - Plot 221: the 20 Jul 2026 KES 5,000 (UGKSG3P3WM) is one receipt, not also a float top-up.
 - Closing balance should agree with the Tendepay statement within a few shillings (Tendepay rounds charges; 11 Nov 2026 difference was KES 3).
