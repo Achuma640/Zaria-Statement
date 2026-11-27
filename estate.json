@@ -33,6 +33,17 @@
  "events": [],
  "workers": [
   {
+   "id": "4",
+   "trade": "Electricians",
+   "name": "Dickens Nampala",
+   "phone": "0715972365",
+   "note": "He did our whole house wiring. And even worked on the solar. Very professional. He followed up with Kenya Power as well until they connected us well after he had finished his work.",
+   "by": "264",
+   "votes": 0,
+   "up": 0,
+   "down": 0
+  },
+  {
    "id": "2",
    "trade": "General contractors",
    "name": "George",
