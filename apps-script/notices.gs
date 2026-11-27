@@ -64,6 +64,30 @@ function doPost(e) {
   return ContentService.createTextOutput('ok');
 }
 
+
+/** Ask GitHub to rebuild the Zaria site now (so an approval shows up in a minute or two instead of waiting for the timer).
+ *  Needs the script property GH_TOKEN: a fine-grained GitHub token for Achuma640/Zaria-Statement with "Actions: Read and write".
+ *  Never throws: if the token is missing or GitHub is down, the approval itself still works and the site updates at the next rebuild. */
+function kickRebuild_() {
+  try {
+    const tok = PropertiesService.getScriptProperties().getProperty('GH_TOKEN');
+    if (!tok) return false;
+    const cache = CacheService.getScriptCache();
+    if (cache.get('kick')) return true;            // one rebuild per minute is plenty
+    cache.put('kick', '1', 60);
+    const r = UrlFetchApp.fetch('https://api.github.com/repos/Achuma640/zaria-statement/actions/workflows/415831276/dispatches', {
+      method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+      headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+      payload: JSON.stringify({ ref: 'main' }) });
+    return r.getResponseCode() === 204;
+  } catch (err) { return false; }
+}
+/** Optional: add an installable "On edit" trigger for this function (Triggers > Add trigger > onSheetEdit > From spreadsheet > On edit)
+ *  so that editing the Workers or Notices tab by hand also starts a rebuild. */
+function onSheetEdit(e) {
+  try { const n = e.range.getSheet().getName(); if (n === 'Workers' || n === 'Notices') kickRebuild_(); } catch (err) {}
+}
+
 function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 function codeOk_(c) { const k = PropertiesService.getScriptProperties().getProperty('APPROVE_CODE'); return !!k && String(c || '') === k; }
 
@@ -81,6 +105,7 @@ function doGet(e) {
     const row = parseInt(e.parameter.r, 10), act = e.parameter.v;
     if (!(row >= 2) || String(sh.getRange(row, 5).getValue()).trim() === '') return json_({ ok: false, error: 'row' });
     sh.getRange(row, 1).setValue(act === 'approve'); sh.getRange(row, 10).setValue(act === 'approve' ? 'Approved' : 'Rejected');
+    kickRebuild_();
     return json_({ ok: true });
   }
   const wsh = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Workers');
@@ -90,7 +115,8 @@ function doGet(e) {
       if (a === 'approve') { wsh.getRange(wi + 1, 1).setValue(true); wsh.getRange(wi + 1, 8).setValue('Approved'); }
       else if (a === 'reject') { wsh.getRange(wi + 1, 1).setValue(false); wsh.getRange(wi + 1, 8).setValue('Rejected'); }
       else return HtmlService.createHtmlOutput('<p>Unknown action.</p>');
-      return HtmlService.createHtmlOutput('<p style="font:20px sans-serif">' + (a === 'approve' ? 'Approved. It will be listed in the Zaria app within about 30 minutes.' : 'Rejected. It will not be listed.') + '</p>');
+      kickRebuild_();
+      return HtmlService.createHtmlOutput('<p style="font:20px sans-serif">' + (a === 'approve' ? 'Approved. It will be listed in the Zaria app within a few minutes.' : 'Rejected. It will not be listed.') + '</p>');
     }
   }
   const tokens = sh.getRange(1, 9, sh.getLastRow(), 1).getValues().map(function (r) { return String(r[0]); });
@@ -100,12 +126,15 @@ function doGet(e) {
   if (a === 'approve') { sh.getRange(row, 1).setValue(true); sh.getRange(row, 10).setValue('Approved'); }
   else if (a === 'reject') { sh.getRange(row, 1).setValue(false); sh.getRange(row, 10).setValue('Rejected'); }
   else return HtmlService.createHtmlOutput('<p>Unknown action.</p>');
+  kickRebuild_();
   return HtmlService.createHtmlOutput('<p style="font:20px sans-serif">' + (a === 'approve' ?
-    'Approved. It will show in the Zaria app within about 30 minutes.' : 'Rejected. It will not be shown.') + '</p>');
+    'Approved. It will show in the Zaria app within a few minutes.' : 'Rejected. It will not be shown.') + '</p>');
 }
 
 /** Run this once from the editor (select "authorize" in the toolbar, then Run) so Google asks for permission to send email. */
 function authorize() {
   MailApp.sendEmail(COMMITTEE, 'Zaria notices script authorised', 'The notice approval emails will now be sent.');
   SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB).getRange(1, 1).getValue();
+  UrlFetchApp.fetch('https://api.github.com/zen', { muteHttpExceptions: true });   // lets Google ask for permission to call GitHub
+  CacheService.getScriptCache();
 }
