@@ -30,7 +30,15 @@
   "book",
   "notice"
  ],
- "events": [],
+ "events": [
+  {
+   "date": "2026-12-12",
+   "time": "",
+   "where": "",
+   "title": "Estate Christmas party",
+   "note": ""
+  }
+ ],
  "workers": [
   {
    "id": "4",
